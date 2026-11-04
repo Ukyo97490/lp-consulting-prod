@@ -1,0 +1,11 @@
+# LP CONSULTING : uniquement si la racine du domaine ne peut pas pointer sur public/.
+# Toutes les requêtes sont envoyées vers public/ ; app/, config/, database/, storage/… restent inaccessibles.
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^public/ - [L]
+  RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+<IfModule !mod_rewrite.c>
+  Require all denied
+</IfModule>

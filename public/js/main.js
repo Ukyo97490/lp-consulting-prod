@@ -1,0 +1,140 @@
+/* LP CONSULTING : interactions du site (vanilla JS, sans dépendance).
+   Les pages sont générées par le serveur ; ce script n'ajoute que le confort d'utilisation. */
+(function () {
+  "use strict";
+
+  var body = document.body;
+  var header = document.querySelector(".site-header");
+  var toggle = document.querySelector(".nav-toggle");
+  var nav = document.getElementById("main-nav");
+
+  /* ---------- Menu mobile ---------- */
+  function closeNav() {
+    body.classList.remove("nav-open");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  }
+  if (toggle && nav) {
+    toggle.addEventListener("click", function () {
+      var open = body.classList.toggle("nav-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    nav.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeNav); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeNav(); });
+    window.addEventListener("resize", function () { if (window.innerWidth > 960) closeNav(); });
+  }
+
+  /* ---------- En-tête au défilement + bouton haut ---------- */
+  var toTop = document.querySelector(".to-top");
+  function onScroll() {
+    var y = window.scrollY || window.pageYOffset;
+    if (header) header.classList.toggle("is-scrolled", y > 20);
+    if (toTop) toTop.classList.toggle("show", y > 600);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  if (toTop) toTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+  /* ---------- Apparition au défilement ---------- */
+  var reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("is-visible"); });
+  }
+
+  /* ---------- Compteurs animés ---------- */
+  var counters = document.querySelectorAll("[data-count]");
+  function animateCount(el) {
+    var target = parseInt(el.getAttribute("data-count"), 10);
+    var prefix = el.getAttribute("data-prefix") || "";
+    var start = null, dur = 1400;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      el.textContent = prefix + Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var co = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { animateCount(entry.target); co.unobserve(entry.target); }
+      });
+    }, { threshold: 0.6 });
+    counters.forEach(function (el) { co.observe(el); });
+  }
+
+  /* ---------- Formulaire de contact (envoi sans rechargement ; fonctionne aussi sans JavaScript) ---------- */
+  var form = document.getElementById("contact-form");
+  if (!form) return;
+  var status = form.querySelector(".form-status");
+  var submit = form.querySelector('button[type="submit"]');
+
+  // Retour d'un envoi sans JavaScript (?contact=ok) : on nettoie l'adresse affichée.
+  if (/[?&]contact=/.test(location.search) && history.replaceState) {
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+
+  function setError(field, msg) {
+    var wrap = field.closest(".field") || field.closest(".consent");
+    var err = wrap ? wrap.querySelector(".error") : null;
+    if (wrap) wrap.classList.toggle("has-error", !!msg);
+    if (err) err.textContent = msg || "";
+    field.setAttribute("aria-invalid", msg ? "true" : "false");
+  }
+  function validate(field) {
+    var v = field.type === "checkbox" ? field.checked : field.value.trim();
+    var msg = "";
+    if (field.required && !v) msg = field.type === "checkbox" ? "Merci d'accepter pour envoyer votre demande." : "Ce champ est requis.";
+    else if (field.type === "email" && v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = "Adresse e-mail invalide.";
+    else if (field.type === "tel" && v && !/^[0-9 +().-]{8,20}$/.test(v)) msg = "Numéro de téléphone invalide.";
+    setError(field, msg);
+    return !msg;
+  }
+  function setStatus(cls, text) {
+    status.className = "form-status " + cls;
+    status.textContent = text;
+  }
+
+  var fields = Array.prototype.filter.call(form.querySelectorAll("input, select, textarea"), function (f) {
+    return f.name !== "website" && f.type !== "hidden";
+  });
+  fields.forEach(function (f) {
+    f.addEventListener("blur", function () { validate(f); });
+    f.addEventListener("input", function () { if (f.getAttribute("aria-invalid") === "true") validate(f); });
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var ok = true, first = null;
+    fields.forEach(function (f) { if (!validate(f)) { ok = false; if (!first) first = f; } });
+    if (!ok) {
+      setStatus("ko", "Merci de vérifier les champs signalés.");
+      if (first) first.focus();
+      return;
+    }
+    submit.disabled = true;
+    setStatus("", "Envoi en cours…");
+    fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" }, credentials: "same-origin" })
+      .then(function (r) { return r.json().catch(function () { return { status: "erreur", errors: {} }; }); })
+      .then(function (res) {
+        if (res.status === "ok") {
+          form.reset();
+          setStatus("ok", "Merci, votre demande a bien été envoyée. Nous vous répondons rapidement.");
+        } else if (res.status === "limite") {
+          setStatus("ko", "Trop de demandes envoyées depuis votre connexion. Merci de réessayer plus tard.");
+        } else {
+          Object.keys(res.errors || {}).forEach(function (k) { if (form[k]) setError(form[k], res.errors[k]); });
+          setStatus("ko", "Votre demande n'a pas pu être envoyée. Merci de vérifier les champs signalés.");
+        }
+      })
+      .catch(function () { setStatus("ko", "Connexion impossible. Merci de réessayer ou de nous écrire par e-mail."); })
+      .then(function () { submit.disabled = false; });
+  });
+})();

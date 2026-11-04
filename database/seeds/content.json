@@ -1,0 +1,155 @@
+{
+  "site": {
+    "name": "LP CONSULTING",
+    "tagline": "Construire des solutions durables",
+    "domain": "https://www.lp-consulting.re",
+    "email": "contact@lp-consulting.re",
+    "phone": "06 92 94 35 67",
+    "zone": "La Réunion (974)",
+    "footer_text": "Études techniques, préparation de chantier et direction de travaux : un appui opérationnel pour les entreprises du BTP à La Réunion."
+  },
+  "home": {
+    "seo_title": "LP CONSULTING | Assistance BTP à La Réunion",
+    "seo_description": "LP CONSULTING accompagne les entreprises du BTP à La Réunion : études techniques et appels d’offres, préparation de chantier, direction de travaux. 27 ans d’expérience terrain.",
+    "hero_eyebrow": "Études • Préparation • Direction de travaux",
+    "hero_title": "Un accompagnement opérationnel pour les entreprises du",
+    "hero_highlight": "BTP à La Réunion",
+    "hero_lead": "27 années d’expérience entre études techniques, études de prix, méthodes et conduite de travaux, au service de vos opérations, de l’analyse du dossier jusqu’à l’exécution.",
+    "hero_image": "img/nrl-m24-possession.jpg",
+    "hero_tags": ["Conseil", "Ingénierie", "Accompagnement"],
+    "stats": [
+      {"value": "27", "prefix": "", "label": "années d’expérience dans le BTP"},
+      {"value": "300", "prefix": "+ ", "label": "études dirigées sur le procédé COMPOSTYRÈNE"},
+      {"value": "90", "prefix": "", "label": "chantiers de mise en œuvre"},
+      {"value": "2016", "prefix": "", "label": "installé à La Réunion"}
+    ],
+    "about_eyebrow": "Présentation du fondateur",
+    "about_title": "Une expérience du BTP acquise sur le terrain, en études et en direction de travaux",
+    "about_lead": "LP CONSULTING s’appuie sur 27 années d’expérience dans le bâtiment et les travaux publics, entre études techniques, études de prix, méthodes, préparation de chantier et conduite de travaux.",
+    "about_text": "Mon parcours m’a amené à intervenir au sein de grands groupes du BTP, notamment COLAS, BOUYGUES et VINCI, ainsi qu’auprès d’entreprises locales, sur des opérations de terrassement, VRD, bâtiment, génie civil et fondations spéciales.\n\nEn début de carrière, j’ai dirigé pendant sept ans la Cellule des travaux spéciaux de SCREG SUD-EST, filiale du Groupe COLAS à Lyon. J’ai notamment participé à la rédaction de l’Avis Technique chaussée n° 151 relatif au procédé COMPOSTYRÈNE, une technique de remblais légers en polystyrène.\n\nMon parcours comprend également la conduite des travaux de battage pour le nouveau quai du Port de Longoni à Mayotte, puis la direction d’études en conception-réalisation pour des opérations de 31 à 50 M€ à Mayotte et en Guadeloupe.\n\nAprès des expériences professionnelles à Mayotte, au Maroc et en Guadeloupe, je suis installé à La Réunion depuis 2016. Aujourd’hui, avec LP CONSULTING, j’apporte aux entreprises du BTP un appui opérationnel fondé sur une vision transversale des projets, avec une attention constante portée aux contraintes techniques, aux coûts et aux délais.",
+    "timeline": [
+      {"title": "Lyon : SCREG SUD-EST (Groupe COLAS)", "text": "7 ans à la tête de la Cellule des travaux spéciaux"},
+      {"title": "Mayotte", "text": "Port de Longoni, études en conception-réalisation"},
+      {"title": "Maroc et Guadeloupe", "text": "Expériences professionnelles, dont l’étude TCE du Centre des Arts et de la Culture de Pointe-à-Pitre"},
+      {"title": "La Réunion, depuis 2016", "text": "NRL, TCSP d’Étang-Salé, CHU de Saint-Pierre, puis création de LP CONSULTING"}
+    ],
+    "about_image": "img/bandeau-chantiers.jpg",
+    "about_caption": "Terrassement • VRD • Bâtiment • Génie civil • Fondations spéciales",
+    "groups": ["COLAS", "BOUYGUES", "VINCI", "RAZEL-BEC"],
+    "missions_eyebrow": "Une expérience au service de vos opérations",
+    "missions_title": "Trois missions, de l’offre à l’exécution",
+    "missions_text": "LP CONSULTING intervient en appui des équipes de ses clients, avec des prestations adaptées aux besoins de chaque opération et au périmètre convenu avec l’entreprise.",
+    "expertise_eyebrow": "Expertise travaux spéciaux",
+    "expertise_title": "COMPOSTYRÈNE : une expertise en remblais légers",
+    "expertise_text": "Au sein de SCREG SUD-EST (Groupe COLAS), participation à la rédaction de l’Avis Technique chaussée n° 151 relatif au procédé COMPOSTYRÈNE, une technique de remblais légers en polystyrène expansé utilisée sur sols compressibles ou instables.\n\nEntre 1999 et 2006, plus de 300 études ont été réalisées sous ma direction et le procédé a été mis en œuvre sur 90 chantiers.",
+    "expertise_link_label": "Avis technique IDRRIM en vigueur (PDF)",
+    "expertise_link": "docs/avis-technique-compostyrene.pdf",
+    "expertise_figures": [
+      {"value": "+ 300", "label": "études réalisées"},
+      {"value": "90", "label": "chantiers de mise en œuvre"},
+      {"value": "1999 à 2006", "label": "Direction de la Cellule des travaux spéciaux"}
+    ],
+    "refs_eyebrow": "Références",
+    "refs_title": "Des projets d’envergure, de l’étude à l’exécution",
+    "refs_text": "Une expérience acquise sur des opérations majeures à Mayotte, en Guadeloupe et à La Réunion, depuis les études en conception-réalisation jusqu’à la direction de travaux.",
+    "cta_title": "Découvrez les missions et contactez LP CONSULTING",
+    "cta_text": "Études, préparation ou direction de travaux : présentez votre opération, nous étudions ensemble le périmètre d’accompagnement adapté.",
+    "contact_title": "Parlons de votre prochaine opération",
+    "contact_text": "Dossier de consultation, démarrage de chantier ou besoin de pilotage : décrivez votre projet, vous recevrez une réponse rapidement."
+  },
+  "missions": {
+    "etudes-techniques": {
+      "num": "01",
+      "short": "Études techniques",
+      "card_text": "Sécuriser vos réponses aux marchés grâce à une expertise technique adaptée au BTP.",
+      "card_points": ["Mémoires techniques", "Études de prix (DQE, BPE)", "Documents QSE"],
+      "icon": "etudes",
+      "seo_title": "Études techniques et appels d’offres BTP à La Réunion",
+      "seo_description": "Mémoires techniques, études de prix (DQE, BPE), consultation des sous-traitants et documents QSE : LP CONSULTING sécurise vos réponses aux appels d’offres BTP à La Réunion.",
+      "eyebrow": "Article 01 / Études techniques et appels d’offres",
+      "h1": "Sécuriser vos réponses aux marchés grâce à une expertise technique adaptée au BTP",
+      "hero_image": "img/aerogare-mayotte.jpg",
+      "split_image": "img/centre-penitentiaire-mayotte.jpg",
+      "split_label": "Visuel de projet",
+      "intro": "Répondre à un appel d’offres demande de comprendre les exigences du marché, de définir une méthode d’exécution réaliste et de présenter des moyens adaptés aux travaux.\n\nLP CONSULTING accompagne les entreprises du BTP dans l’analyse des dossiers de consultation et la préparation de leurs offres techniques et financières.",
+      "services": [
+        {"title": "Mémoire technique et pièces d’offre", "text": "Rédaction et mise en forme des mémoires techniques, méthodologies constructives, plans de phasage, plannings prévisionnels et dossiers de fiches techniques, en cohérence avec les exigences du dossier de consultation."},
+        {"title": "Études de prix", "text": "Réalisation d’études de prix et préparation des documents quantitatifs et financiers, notamment DQE et BPE, afin de structurer les coûts prévisionnels et de relier les choix techniques aux moyens nécessaires."},
+        {"title": "Consultation et analyse des offres", "text": "Consultation des fournisseurs et sous-traitants, comparaison de leurs propositions et analyse des solutions au regard des contraintes techniques, économiques et calendaires du projet."},
+        {"title": "Documents qualité, sécurité et environnement", "text": "Assistance à la rédaction des documents QSE demandés par le marché, notamment SOPAQ, SOGED et PPSPS, selon le périmètre de la mission et les besoins de l’entreprise."}
+      ],
+      "objective": "Vous aider à présenter une offre claire, structurée et cohérente, qui mette en relation les solutions techniques, les moyens humains et matériels, le budget et les délais annoncés.",
+      "cta_title": "Vous préparez une réponse à un appel d’offres ?",
+      "cta_text": "Échangeons sur votre prochain dossier de consultation : LP CONSULTING vous accompagne dans la construction de votre dossier technique."
+    },
+    "preparation-chantier": {
+      "num": "02",
+      "short": "Préparation de chantier",
+      "card_text": "Anticiper les travaux pour maîtriser les coûts, les délais et les interfaces.",
+      "card_points": ["Procédures d’exécution et métrés", "Budgets et plannings", "Synthèse des lots et phasage"],
+      "icon": "prepa",
+      "seo_title": "Préparation et organisation de chantier à La Réunion",
+      "seo_description": "Procédures d’exécution, métrés TCE, budgets, plannings, synthèse des lots et phasage : LP CONSULTING prépare vos chantiers BTP à La Réunion.",
+      "eyebrow": "Article 02 / Préparation de chantier",
+      "h1": "Anticiper les travaux pour maîtriser les coûts, les délais et les interfaces",
+      "hero_image": "img/chu-saint-pierre.jpg",
+      "split_image": "img/tcsp-etang-sale.jpg",
+      "split_label": "Visuel de projet",
+      "intro": "Une préparation rigoureuse permet d’anticiper les difficultés, d’organiser les moyens et de coordonner les intervenants avant le démarrage.\n\nLP CONSULTING accompagne les entreprises dans la préparation opérationnelle de leurs chantiers, depuis les études d’exécution jusqu’au phasage des travaux.",
+      "services": [
+        {"title": "Procédures et métrés", "text": "Rédaction des procédures d’exécution et réalisation des métrés tous corps d’état, en tenant compte des prescriptions du marché, des contraintes du site et des méthodes retenues."},
+        {"title": "Consultation des fournisseurs et sous-traitants", "text": "Préparation des consultations, analyse comparative des propositions et identification de solutions compatibles avec les besoins techniques et les objectifs économiques du chantier."},
+        {"title": "Budgets et planification", "text": "Établissement du budget initial, du planning financier et du planning prévisionnel d’exécution pour structurer les besoins, les dépenses attendues et l’enchaînement des tâches."},
+        {"title": "Synthèse des lots et phasage", "text": "Coordination des interfaces entre corps d’état techniques et architecturaux, identification des points sensibles et élaboration du phasage en fonction des accès, des priorités d’intervention et des contraintes de coactivité."}
+      ],
+      "objective": "Transformer les données du marché en une organisation opérationnelle claire, afin d’anticiper les besoins, de limiter les imprévus et de donner aux équipes une vision partagée des objectifs du chantier.",
+      "cta_title": "Vous préparez le démarrage d’une opération ?",
+      "cta_text": "Préparons ensemble les étapes clés de votre opération : organisation technique, financière et opérationnelle de votre chantier."
+    },
+    "direction-travaux": {
+      "num": "03",
+      "short": "Direction de travaux",
+      "card_text": "Piloter les équipes, coordonner les interventions et suivre la performance du chantier.",
+      "card_points": ["Coordination des équipes", "Pilotage des délais et OPC", "Suivi budgétaire"],
+      "icon": "direction",
+      "seo_title": "Direction de travaux et pilotage de chantier à La Réunion",
+      "seo_description": "Coordination des équipes, suivi technique, pilotage des délais et OPC, suivi budgétaire : LP CONSULTING assure la direction de travaux de vos chantiers BTP à La Réunion.",
+      "eyebrow": "Article 03 / Direction de travaux et pilotage de chantier",
+      "h1": "Piloter les équipes, coordonner les interventions et suivre la performance du chantier",
+      "hero_image": "img/bandeau-chantiers.jpg",
+      "split_image": "img/nrl-m24-possession.jpg",
+      "split_label": "Photo de chantier",
+      "intro": "La réussite d’un chantier dépend de la coordination des équipes, des matériels, des approvisionnements et des corps d’état. Elle nécessite aussi un suivi régulier des coûts, des délais et de la qualité d’exécution.\n\nLP CONSULTING propose des missions de direction de travaux et de pilotage adaptées aux besoins de l’opération.",
+      "services": [
+        {"title": "Organisation des équipes et coordination", "text": "Organisation des moyens humains et matériels, suivi des approvisionnements, participation aux réunions de chantier et suivi des actions à mener avec les intervenants."},
+        {"title": "Suivi technique de l’exécution", "text": "Suivi des travaux au regard des documents d’exécution, des prescriptions du marché et des contraintes rencontrées sur le terrain. Les difficultés identifiées sont suivies avec les acteurs concernés afin de rechercher des solutions adaptées."},
+        {"title": "Pilotage des délais et des interfaces", "text": "Élaboration et suivi des plannings d’exécution tous corps d’état, coordination des enchaînements et, selon le périmètre convenu, missions d’ordonnancement, de pilotage et de coordination (OPC)."},
+        {"title": "Suivi budgétaire et financier", "text": "Établissement et suivi du budget global et du planning financier, suivi de l’avancement des prestations et contribution à la préparation des situations de travaux."}
+      ],
+      "objective": "Donner au client une vision claire de l’avancement, des contraintes et des besoins du chantier, tout en favorisant la coordination des intervenants et la maîtrise des objectifs techniques, financiers et calendaires.",
+      "cta_title": "Vous recherchez un appui pour diriger ou piloter vos travaux ?",
+      "cta_text": "Présentez vos enjeux et vos besoins d’accompagnement : LP CONSULTING étudie avec vous les besoins de votre opération à La Réunion."
+    }
+  },
+  "references": {
+    "seo_title": "Références : projets étudiés et chantiers dirigés | LP CONSULTING",
+    "seo_description": "Références de LP CONSULTING : études en conception-réalisation (Mayotte, Guadeloupe) et direction de travaux (NRL, TCSP d’Étang-Salé, CHU de Saint-Pierre, Port de Longoni).",
+    "hero_image": "img/port-longoni.jpg",
+    "title": "Des projets d’envergure, de l’étude à l’exécution",
+    "text": "Une expérience acquise sur des opérations majeures à Mayotte, en Guadeloupe et à La Réunion, depuis les études en conception-réalisation jusqu’à la direction de travaux.",
+    "group_etudes": "Études de projets et réponses en conception-réalisation",
+    "group_travaux": "Direction et conduite de travaux",
+    "note": "Les images signalées « Visuel de projet » sont des perspectives ou visuels d’opérations et non des photos de travaux réalisés. Montants indiqués : montant global de l’opération.",
+    "cta_title": "Votre opération mérite le même niveau d’exigence",
+    "cta_text": "Études, préparation ou direction de travaux : échangeons sur vos enjeux et le périmètre d’accompagnement adapté."
+  },
+  "legal": {
+    "company": "LP CONSULTING",
+    "legal_form": "entreprise individuelle de Lionel PETIT (EI)",
+    "address": "3B rue Jean-Jacques Rousseau, 97419 La Possession, La Réunion",
+    "siret": "793 378 183 00024",
+    "director": "Lionel PETIT",
+    "host": "o2switch, SAS au capital de 100 000 €, Chemin des Pardiaux, 63000 Clermont-Ferrand, France\nTéléphone : 04 44 44 60 40 · SIRET 510 909 807 00032 (RCS Clermont-Ferrand) · www.o2switch.fr",
+    "designer": "DG-Web, dg-web.re"
+  }
+}

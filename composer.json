@@ -1,0 +1,21 @@
+{
+    "name": "lp-consulting/site",
+    "description": "Site LP CONSULTING (PHP / MySQL, architecture MVC sans dépendance)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo_mysql": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*"
+    },
+    "suggest": {
+        "ext-gd": "Réencodage et redimensionnement des images envoyées",
+        "ext-intl": "Meilleure conversion des accents dans les identifiants",
+        "ext-exif": "Orientation des photos prises au téléphone"
+    },
+    "autoload": {
+        "psr-4": { "App\\": "app/" },
+        "files": ["app/helpers.php"]
+    }
+}

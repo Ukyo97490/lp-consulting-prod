@@ -1,0 +1,9 @@
+# Images envoyées depuis l'administration : aucun script exécutable, images uniquement
+Options -Indexes -ExecCGI
+RemoveHandler .php .phtml .phar .cgi .pl .py
+<FilesMatch "\.(?!(jpe?g|png|webp)$)[^.]+$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
