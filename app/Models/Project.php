@@ -32,13 +32,13 @@ final class Project extends Model
             }
             foreach ($projects as $i => $p) {
                 Database::exec(
-                    'INSERT INTO projects (slug, category, title, client, role, duration, budget, budget_note, status, image, image_type, description, featured, visible, position)
-                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    'INSERT INTO projects (slug, category, title, client, role, duration, budget, budget_note, status, image, image_alt, image_type, description, featured, visible, position)
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                      ON DUPLICATE KEY UPDATE category=VALUES(category), title=VALUES(title), client=VALUES(client), role=VALUES(role), duration=VALUES(duration),
-                       budget=VALUES(budget), budget_note=VALUES(budget_note), status=VALUES(status), image=VALUES(image), image_type=VALUES(image_type),
+                       budget=VALUES(budget), budget_note=VALUES(budget_note), status=VALUES(status), image=VALUES(image), image_alt=VALUES(image_alt), image_type=VALUES(image_type),
                        description=VALUES(description), featured=VALUES(featured), visible=VALUES(visible), position=VALUES(position)',
                     [$p['id'], $p['category'], $p['title'], $p['client'], $p['role'], $p['duration'], $p['budget'], $p['budget_note'],
-                     $p['status'], $p['image'], $p['image_type'], $p['description'], (int) $p['featured'], (int) $p['visible'], $i]
+                     $p['status'], $p['image'], $p['image_alt'], $p['image_type'], $p['description'], (int) $p['featured'], (int) $p['visible'], $i]
                 );
             }
         });
@@ -49,7 +49,7 @@ final class Project extends Model
         return [
             'id' => $r['slug'], 'category' => $r['category'], 'title' => $r['title'], 'client' => $r['client'], 'role' => $r['role'],
             'duration' => $r['duration'], 'budget' => $r['budget'], 'budget_note' => $r['budget_note'], 'status' => $r['status'],
-            'image' => $r['image'], 'image_type' => $r['image_type'], 'description' => $r['description'],
+            'image' => $r['image'], 'image_alt' => $r['image_alt'] ?? '', 'image_type' => $r['image_type'], 'description' => $r['description'],
             'featured' => (bool) $r['featured'], 'visible' => (bool) $r['visible'],
         ];
     }

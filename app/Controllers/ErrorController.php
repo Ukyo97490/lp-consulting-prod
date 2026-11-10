@@ -11,8 +11,8 @@ final class ErrorController extends SiteController
     public function notFound(): Response
     {
         if ($this->request->wantsJson()) return $this->json(['error' => 'Ressource introuvable.'], 404);
-        $name = \App\Services\SiteContent::content()['site']['name'];
-        return $this->page('404', ['title' => 'Page introuvable | ' . $name, 'path' => ltrim($this->request->path, '/'), 'noindex' => true], [], 404);
+        $c = \App\Services\SiteContent::content();
+        return $this->page('404', ['title' => $c['ui']['notfound_crumb'] . ' | ' . $c['site']['name'], 'path' => ltrim($this->request->path, '/'), 'noindex' => true], [], 404);
     }
 
     public function methodNotAllowed(): Response

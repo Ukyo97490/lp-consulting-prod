@@ -10,9 +10,9 @@ namespace App\Services;
  */
 final class ContentSchema
 {
-    public const SECTIONS = ['site', 'home', 'missions', 'references', 'legal'];
+    public const SECTIONS = ['site', 'home', 'missions', 'references', 'legal', 'ui'];
     public const MISSIONS = ['etudes-techniques', 'preparation-chantier', 'direction-travaux'];
-    public const STATUS = ['won' => 'Offre remportée', 'lost' => 'Offre non retenue', 'works' => 'Chantier réalisé'];
+    public const STATUS = ['won' => 'Offre remportée', 'lost' => 'Offre non retenue', 'works' => 'Chantier réalisé', 'prep' => 'Opération en cours'];
     public const IMAGE_TYPES = ['visual' => 'Visuel de projet', 'photo' => 'Photo de chantier', 'none' => ''];
     public const CATEGORIES = ['etudes', 'travaux'];
 
@@ -58,6 +58,7 @@ final class ContentSchema
             'budget_note' => $t('budget_note'),
             'status'      => isset(self::STATUS[$p['status'] ?? '']) ? $p['status'] : 'works',
             'image'       => self::isImagePath($image) ? $image : 'img/bandeau-chantiers.jpg',
+            'image_alt'   => $t('image_alt'),
             'image_type'  => isset(self::IMAGE_TYPES[$p['image_type'] ?? '']) ? $p['image_type'] : 'none',
             'description' => $t('description', 5000),
             'featured'    => !empty($p['featured']),
@@ -91,6 +92,7 @@ final class ContentSchema
             return $out;
         }
         if (is_array($template)) {
+            if ($value === null) return $template;
             $value = is_array($value) ? array_values($value) : [];
             $item = $template[0] ?? '';
             $out = [];

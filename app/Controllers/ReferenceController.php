@@ -21,6 +21,7 @@ final class ReferenceController extends SiteController
         return $this->page('references', [
             'title'       => $r['seo_title'],
             'description' => $r['seo_description'],
+            'excerpt'     => $r['text'],
             'path'        => 'references',
             'nav'         => 'references',
         ], ['groups' => $groups]);

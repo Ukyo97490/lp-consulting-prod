@@ -15,8 +15,9 @@ final class MissionController extends SiteController
         $mission = $c['missions'][$slug];
 
         return $this->page('mission', [
-            'title'       => $mission['seo_title'] . ' | ' . $c['site']['name'],
+            'title'       => $mission['seo_title'],
             'description' => $mission['seo_description'],
+            'excerpt'     => $mission['intro'],
             'path'        => $slug,
             'nav'         => $slug,
         ], [

@@ -62,8 +62,10 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 .kpi span { display: block; margin-top: 6px; font-weight: 600; }
 .kpi small { color: var(--muted); }
 .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.quick a { background: var(--navy); color: #fff; padding: 18px; text-decoration: none; border-radius: 4px; }
-.quick a:hover { background: var(--steel); }
+.quick a, .quick button { background: var(--navy); color: #fff; padding: 18px; text-decoration: none; border-radius: 4px; }
+.quick a:hover, .quick button:hover { background: var(--steel); }
+.quick button { border: 0; font: inherit; text-align: left; cursor: pointer; }
+.quick button:disabled { opacity: .6; cursor: wait; }
 .quick b { display: block; font-family: var(--head); margin-bottom: 4px; }
 .quick span { color: var(--skyl); font-size: .92rem; }
 .notice { margin-top: 26px; background: #fff7e0; border-left: 4px solid #d79b1d; padding: 14px 16px; font-size: .95rem; }
@@ -74,13 +76,22 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 .fld { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; min-width: 0; }
 .fld.wide, .help.wide, .card > .check { grid-column: 1 / -1; }
 .fld label, .lbl { font-family: var(--head); font-size: .78rem; font-weight: 600; color: var(--navy); }
-input[type=text], input[type=email], input:not([type]), textarea, select {
+input[type=text], input[type=email], input[type=password], input:not([type]), textarea, select {
   font: inherit; font-size: .98rem; color: var(--text); width: 100%;
   padding: 9px 12px; border: 1px solid #c8dbe4; border-radius: 4px; background: #fff;
 }
 textarea { resize: vertical; line-height: 1.5; }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 3px rgba(109,172,193,.25); }
 .help { color: var(--muted); font-size: .84rem; }
+.fld[hidden] { display: none; }
+.pw-field { position: relative; }
+.pw-field input { padding-right: 42px; }
+.pw-toggle { position: absolute; top: 0; right: 0; bottom: 0; width: 40px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 0 4px 4px 0; background: none; color: var(--muted); cursor: pointer; }
+.pw-toggle:hover, .pw-toggle[aria-pressed="true"] { color: var(--navy); }
+.pw-toggle:focus-visible { outline: 2px solid var(--sky); outline-offset: -2px; }
+.account { max-width: 760px; margin-top: 22px; }
+.card-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding: 10px 0 14px; }
+.card > .help.wide { margin: -6px 0 6px; }
 .counter { font-size: .78rem; color: var(--muted); align-self: flex-end; margin-top: -2px; }
 .counter.over { color: var(--err); font-weight: 600; }
 .check { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; font-weight: 500; }
@@ -139,6 +150,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--s
 .pill-won { background: #e3f3ea; color: var(--ok); }
 .pill-lost { background: #eef1f4; color: #5b6b78; }
 .pill-works { background: var(--mist); color: var(--navy); }
+.pill-prep { background: #fdf3dc; color: #8a5a00; }
 .mini { display: inline; margin: 0; }
 .ico-btn { border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--navy); font-size: 1rem; }
 .switch { display: inline-block; width: 36px; height: 20px; border-radius: 10px; background: #c9d6dd; position: relative; transition: background .2s; vertical-align: middle; }

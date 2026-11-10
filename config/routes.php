@@ -44,11 +44,14 @@ return function (Router $r): void {
     $r->post('/admin/api/content', [Api\ContentController::class, 'update'], $api);
     $r->post('/admin/api/projects', [Api\ProjectController::class, 'update'], $api);
     $r->post('/admin/api/upload', [Api\UploadController::class, 'store'], $api);
+    $r->post('/admin/api/tools/minify', [Api\ToolController::class, 'minify'], $api);
+    $r->post('/admin/api/tools/images', [Api\ToolController::class, 'images'], $api);
     $r->get('/admin/api/messages', [Api\MessageController::class, 'index'], $api);
     $r->post('/admin/api/messages/{id:\d+}/read', [Api\MessageController::class, 'read'], $api);
     $r->post('/admin/api/messages/{id:\d+}/delete', [Api\MessageController::class, 'destroy'], $api);
     $r->get('/admin/api/revisions', [Api\RevisionController::class, 'index'], $api);
     $r->post('/admin/api/revisions/{id:\d+}/restore', [Api\RevisionController::class, 'restore'], $api);
+    $r->post('/admin/api/account/profile', [Api\AccountController::class, 'profile'], $api);
     $r->post('/admin/api/account/password', [Api\AccountController::class, 'password'], $api);
 
     /* ---------- Installation (désactivée par défaut) ---------- */

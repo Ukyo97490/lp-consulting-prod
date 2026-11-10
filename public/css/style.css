@@ -5,6 +5,11 @@
 @font-face { font-family: "Source Sans 3"; font-weight: 400; font-display: swap; src: url("../fonts/source-sans-3-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Source Sans 3"; font-weight: 500; font-display: swap; src: url("../fonts/source-sans-3-latin-500-normal.woff2") format("woff2"); }
 @font-face { font-family: "Source Sans 3"; font-weight: 600; font-display: swap; src: url("../fonts/source-sans-3-latin-600-normal.woff2") format("woff2"); }
+/* Polices de secours ajustées aux métriques de Montserrat et Source Sans 3 (largeur moyenne, hauteurs) :
+   le texte ne bouge presque pas quand la vraie police remplace la police système. */
+@font-face { font-family: "Montserrat Secours"; font-weight: 100 600; src: local("Arial"); size-adjust: 108.7%; ascent-override: 89.1%; descent-override: 23.1%; line-gap-override: 0%; }
+@font-face { font-family: "Montserrat Secours"; font-weight: 700 900; src: local("Arial Bold"), local("Arial-BoldMT"); size-adjust: 110.3%; ascent-override: 87.7%; descent-override: 22.7%; line-gap-override: 0%; }
+@font-face { font-family: "Source Sans Secours"; src: local("Arial"); size-adjust: 93.1%; ascent-override: 110%; descent-override: 43%; line-gap-override: 0%; }
 
 /* =========================================================
    LP CONSULTING : feuille de style principale
@@ -24,8 +29,8 @@
   --muted: #5b7384;
   --line: #d6e6ee;
 
-  --font-head: "Montserrat", system-ui, sans-serif;
-  --font-body: "Source Sans 3", system-ui, sans-serif;
+  --font-head: "Montserrat", "Montserrat Secours", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Source Sans Secours", system-ui, sans-serif;
 
   --radius: 4px;
   --wrap: 1180px;
@@ -53,6 +58,7 @@ body {
 }
 
 img { max-width: 100%; height: auto; display: block; }
+picture { display: contents; }
 a { color: var(--steel); text-decoration: none; }
 a:hover { color: var(--navy); }
 
@@ -185,10 +191,10 @@ p { margin: 0 0 1em; }
 }
 .hero-media {
   position: absolute; inset: 0; z-index: -2;
-  background: url("../img/nrl-m24-possession.jpg") center 40% / cover no-repeat;
   transform: scale(1.05);
   animation: heroZoom 18s ease-out forwards;
 }
+.hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
 @keyframes heroZoom { to { transform: scale(1); } }
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
@@ -203,7 +209,6 @@ p { margin: 0 0 1em; }
   clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%);
   pointer-events: none;
 }
-.hero .wrap { position: relative; }
 .hero-content { max-width: 720px; }
 .hero h1 { color: #fff; margin-bottom: .4em; }
 .hero h1 em { font-style: normal; color: var(--sky-light); }
@@ -218,9 +223,12 @@ p { margin: 0 0 1em; }
 }
 .hero-tags span::before { content: "✦"; color: var(--sky); margin-right: 10px; font-size: .7rem; }
 
-.hero-mark {
-  position: absolute; right: var(--gutter); bottom: -40px;
-  width: clamp(160px, 22vw, 280px); opacity: .14;
+/* Motif décoratif du logo, en bas à droite : pseudo-élément plutôt qu'une image sans texte alternatif.
+   .hero .wrap n'est pas positionné, le motif se place donc par rapport à .hero. */
+.hero > .wrap::after {
+  content: ""; position: absolute; right: var(--gutter); bottom: -40px;
+  width: clamp(160px, 22vw, 280px); aspect-ratio: 196 / 240; opacity: .14;
+  background: url("../img/logo-mark-blanc.webp") center / contain no-repeat;
   pointer-events: none;
 }
 
@@ -234,6 +242,7 @@ p { margin: 0 0 1em; }
   background: #fff; box-shadow: var(--shadow);
   border-top: 4px solid var(--sky);
 }
+.stats-grid--duo { grid-template-columns: repeat(2, 1fr); }
 .stat { padding: 30px 26px; border-right: 1px solid var(--line); }
 .stat:last-child { border-right: 0; }
 .stat strong {
@@ -372,6 +381,7 @@ p { margin: 0 0 1em; }
 .status-won { background: #e3f3ea; color: #1d6b43; }
 .status-lost { background: #eef1f4; color: #5b6b78; }
 .status-works { background: var(--mist); color: var(--navy); }
+.status-prep { background: #fdf3dc; color: #8a5a00; }
 .ref-body { padding: 22px 24px 26px; display: flex; flex-direction: column; flex: 1; }
 .ref-body h3 { font-size: 1.12rem; margin-bottom: .5em; }
 .ref-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .86rem; color: var(--steel); font-weight: 600; margin-bottom: 12px; }
@@ -395,7 +405,8 @@ p { margin: 0 0 1em; }
   position: relative; color: #fff; background: var(--navy-ink); overflow: hidden; isolation: isolate;
   padding: calc(var(--header-h) + 70px) 0 80px;
 }
-.page-hero-media { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center; }
+.page-hero-media { position: absolute; inset: 0; z-index: -2; }
+.page-hero-media img { width: 100%; height: 100%; object-fit: cover; }
 .page-hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background: linear-gradient(100deg, rgba(6,31,48,.96) 0%, rgba(12,63,94,.88) 55%, rgba(12,63,94,.5) 100%);
@@ -457,7 +468,7 @@ p { margin: 0 0 1em; }
 }
 .cta::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: url("../img/bandeau-chantiers.jpg") center / cover no-repeat; opacity: .16;
+  background: url("../img/bandeau-chantiers-800w.webp") center / cover no-repeat; opacity: .16;
 }
 .cta::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
@@ -472,7 +483,7 @@ p { margin: 0 0 1em; }
 .contact-info { background: var(--navy); color: #fff; padding: 44px 38px; position: relative; overflow: hidden; }
 .contact-info::after {
   content: ""; position: absolute; right: -60px; bottom: -40px; width: 220px; height: 220px;
-  background: url("../img/logo-mark-blanc.png") center / contain no-repeat; opacity: .1;
+  background: url("../img/logo-mark-blanc.webp") center / contain no-repeat; opacity: .1;
 }
 .contact-info h3 { color: #fff; font-size: 1.35rem; }
 .contact-info > p { color: rgba(255,255,255,.78); }
@@ -510,7 +521,7 @@ p { margin: 0 0 1em; }
 .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 50px; }
 .footer-brand img { width: 220px; margin-bottom: 18px; }
 .footer-brand p { max-width: 320px; }
-.site-footer h4 { color: #fff; font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 18px; }
+.site-footer h2 { color: #fff; font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 18px; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; }
 .site-footer li { padding: 5px 0; }
 .site-footer a { color: rgba(255,255,255,.72); }
@@ -541,15 +552,18 @@ p { margin: 0 0 1em; }
 .placeholder { background: #fff6d6; padding: 0 4px; }
 
 /* ---------- Animations d'apparition ---------- */
-.reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
-.reveal.is-visible { opacity: 1; transform: none; }
+/* Le contenu reste toujours visible (opacité 1), avec ou sans JavaScript : seul un léger glissement est animé,
+   et uniquement si le visiteur n'a pas demandé à réduire les animations. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal { transform: translateY(16px); transition: transform .8s var(--ease); }
+  .js .reveal.is-visible { transform: none; }
+}
 .reveal-delay-1 { transition-delay: .1s; }
 .reveal-delay-2 { transition-delay: .2s; }
 .reveal-delay-3 { transition-delay: .3s; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .reveal { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
 }
 
@@ -591,6 +605,7 @@ p { margin: 0 0 1em; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: 0; }
   .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .stats-grid--duo .stat:nth-child(-n+2) { border-bottom: 0; }
 
   .about-grid, .highlight-grid, .split, .contact-grid { grid-template-columns: 1fr; }
   .about-aside { position: static; max-width: 520px; }
@@ -602,7 +617,7 @@ p { margin: 0 0 1em; }
   body { font-size: 1.02rem; padding-bottom: 64px; }
   .hero { min-height: auto; padding-bottom: 100px; }
   .hero-actions .btn { flex: 1 1 100%; justify-content: center; }
-  .hero-mark { display: none; }
+  .hero > .wrap::after { display: none; }
   .stats { margin-top: -40px; }
   .stat { padding: 22px 18px; }
   .missions-grid, .ref-grid, .services, .other-missions { grid-template-columns: 1fr; }
@@ -635,6 +650,7 @@ p { margin: 0 0 1em; }
   .stats-grid { grid-template-columns: 1fr; }
   .stat { border-right: 0; border-bottom: 1px solid var(--line); }
   .stat:last-child { border-bottom: 0; }
+  .stats-grid--duo .stat:first-child { border-bottom: 1px solid var(--line); }
 }
 
 /* Message d'erreur de la case de consentement */

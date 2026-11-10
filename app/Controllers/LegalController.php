@@ -10,13 +10,13 @@ final class LegalController extends SiteController
 {
     public function index(): Response
     {
-        $name = SiteContent::content()['site']['name'];
+        $legal = SiteContent::content()['legal'];
 
         return $this->page('legal', [
-            'title'       => 'Mentions légales | ' . $name,
-            'description' => 'Mentions légales et politique de confidentialité du site ' . $name . '.',
+            'title'       => $legal['seo_title'],
+            'description' => $legal['seo_description'],
+            'excerpt'     => 'Mentions légales et politique de confidentialité du site ' . $legal['company'] . '.',
             'path'        => 'mentions-legales',
-            'noindex'     => true,
         ]);
     }
 }

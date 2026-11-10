@@ -20,7 +20,7 @@ final class SecurityHeaders implements Middleware
             ->withHeader('X-Frame-Options', 'DENY')
             ->withHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
             ->withHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-            ->withHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; "
+            ->withHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-Du+OJKJSbdUgz5nrHeWWINvez6XKDDU/tyj/5c2uvwo=' 'sha256-OXOVWKWWlPMXGi878Q70ZWIIeXRZ4/qha+u8zihY4OU='; "
                 . "font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
         if ($request->isSecure()) $response->withHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 

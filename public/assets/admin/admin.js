@@ -10,7 +10,7 @@
   var BASE = document.querySelector('meta[name="base-path"]').content;
   var CSRF = document.querySelector('meta[name="csrf-token"]').content;
   var MISSIONS = ["etudes-techniques", "preparation-chantier", "direction-travaux"];
-  var STATUS = { won: "Offre remportée", lost: "Offre non retenue", works: "Chantier réalisé" };
+  var STATUS = { won: "Offre remportée", lost: "Offre non retenue", works: "Chantier réalisé", prep: "Opération en cours" };
 
   var state = null;       // { content, projects, library, unread, user }
   var view = document.getElementById("view");
@@ -30,6 +30,12 @@
     var ks = path.split("."), o = obj;
     ks.slice(0, -1).forEach(function (k) { if (o[k] == null || typeof o[k] !== "object") o[k] = {}; o = o[k]; });
     o[ks[ks.length - 1]] = val;
+  }
+  /** Après régénération de la session : le formulaire de déconnexion doit aussi recevoir le nouveau jeton. */
+  function setCsrf(token) {
+    if (!token) return;
+    CSRF = token;
+    document.querySelectorAll('input[name="csrf"]').forEach(function (i) { i.value = token; });
   }
   function site(path) { return BASE + "/" + (path || ""); }
   function fmtDate(s) {
@@ -148,7 +154,7 @@
      ================================================================= */
   var MENU = [
     ["tableau", "Tableau de bord"], ["accueil", "Page d’accueil"], ["missions", "Pages missions"], ["projets", "Projets / références"],
-    ["references", "Page Références"], ["infos", "Coordonnées et mentions"], ["messages", "Demandes de contact"], ["historique", "Historique"], ["compte", "Mon compte"]
+    ["references", "Page Références"], ["infos", "Coordonnées et mentions"], ["textes", "Textes communs"], ["messages", "Demandes de contact"], ["historique", "Historique"], ["compte", "Mon compte"]
   ];
   function renderMenu(active) {
     document.getElementById("side-nav").innerHTML = MENU.map(function (m) {
@@ -168,7 +174,9 @@
       '<a class="kpi" href="' + esc(site()) + '" target="_blank" rel="noopener"><strong>↗</strong><span>voir le site</span><small>version en ligne</small></a></div>' +
       '<h2>Actions rapides</h2><div class="quick"><a href="#projet/nouveau"><b>+ Ajouter un projet</b><span>Nouvelle référence avec photo, rôle, montant et statut.</span></a>' +
       '<a href="#accueil"><b>Modifier l’accueil</b><span>Accroche, chiffres clés, présentation, expertise.</span></a>' +
-      '<a href="#messages"><b>Lire les demandes</b><span>Messages reçus par le formulaire de contact.</span></a></div>';
+      '<a href="#messages"><b>Lire les demandes</b><span>Messages reçus par le formulaire de contact.</span></a></div>' +
+      '<h2>Maintenance</h2><div class="quick"><button type="button" data-tool="minify"><b>Regénérer les CSS et JS allégés</b><span>Après une modification de style.css ou main.js.</span></button>' +
+      '<button type="button" data-tool="images"><b>Optimiser les images</b><span>Crée les copies WebP manquantes et enregistre les dimensions.</span></button></div>';
   }
 
   function vAccueil() {
@@ -177,14 +185,16 @@
       card("Référencement", fText("Titre de la page (Google)", b + "seo_title", h.seo_title, { max: 60, wide: true }) + fText("Description (Google)", b + "seo_description", h.seo_description, { rows: 2, max: 160, wide: true })) +
       card("Ouverture", fText("Sur-titre", b + "hero_eyebrow", h.hero_eyebrow) + fLines("Mots sous l’accroche", b + "hero_tags", h.hero_tags) +
         fText("Accroche", b + "hero_title", h.hero_title, { wide: true }) + fText("Fin de l’accroche (en bleu ciel)", b + "hero_highlight", h.hero_highlight) +
-        fText("Texte d’introduction", b + "hero_lead", h.hero_lead, { rows: 3, wide: true }) + fImage("Photo de fond", b + "hero_image", h.hero_image)) +
+        fText("Texte d’introduction", b + "hero_lead", h.hero_lead, { rows: 3, wide: true }) +
+        fText("Bouton 1 (vers les missions)", b + "hero_btn_missions", h.hero_btn_missions) + fText("Bouton 2 (vers le contact)", b + "hero_btn_contact", h.hero_btn_contact) +
+        fImage("Photo de fond", b + "hero_image", h.hero_image)) +
       card("Chiffres clés", fRepeater("Chiffres", b + "stats", h.stats, { prefix: ["Préfixe"], value: ["Valeur"], label: ["Libellé"] }, "Ajouter un chiffre")) +
       card("Présentation du fondateur", fText("Sur-titre", b + "about_eyebrow", h.about_eyebrow) + fText("Titre", b + "about_title", h.about_title, { wide: true }) +
         fText("Chapeau", b + "about_lead", h.about_lead, { rows: 3, wide: true }) +
         fText("Texte", b + "about_text", h.about_text, { rows: 12, wide: true, help: "Laissez une ligne vide entre deux paragraphes." }) +
         fRepeater("Frise du parcours", b + "timeline", h.timeline, { title: ["Étape"], text: ["Détail", "textarea"] }, "Ajouter une étape") +
         fImage("Image", b + "about_image", h.about_image) + fText("Légende de l’image", b + "about_caption", h.about_caption, { wide: true }) +
-        fLines("Groupes (encadré « Expérience au sein de »)", b + "groups", h.groups)) +
+        fText("Titre de l’encadré des groupes", b + "groups_title", h.groups_title) + fLines("Groupes (un par ligne)", b + "groups", h.groups)) +
       card("Bloc missions", fText("Sur-titre", b + "missions_eyebrow", h.missions_eyebrow) + fText("Titre", b + "missions_title", h.missions_title) +
         fText("Texte", b + "missions_text", h.missions_text, { rows: 3, wide: true }) + '<p class="help wide">Le contenu des trois cartes se modifie dans <a href="#missions">Pages missions</a>.</p>') +
       card("Encadré d’expertise (COMPOSTYRÈNE)", fText("Sur-titre", b + "expertise_eyebrow", h.expertise_eyebrow) + fText("Titre", b + "expertise_title", h.expertise_title) +
@@ -192,10 +202,12 @@
         fText("Libellé du lien", b + "expertise_link_label", h.expertise_link_label) + fText("Lien (PDF ou page)", b + "expertise_link", h.expertise_link, { help: "Chemin sur le site (docs/…) ou adresse https://" }) +
         fRepeater("Chiffres de l’encadré", b + "expertise_figures", h.expertise_figures, { value: ["Valeur"], label: ["Libellé"] }, "Ajouter un chiffre")) +
       card("Références, appel à l’action et contact", fText("Références : sur-titre", b + "refs_eyebrow", h.refs_eyebrow) + fText("Références : titre", b + "refs_title", h.refs_title) +
-        fText("Références : texte", b + "refs_text", h.refs_text, { rows: 2, wide: true }) +
+        fText("Références : texte", b + "refs_text", h.refs_text, { rows: 2, wide: true }) + fText("Références : bouton", b + "refs_button", h.refs_button) +
         '<p class="help wide">Les 4 projets affichés sont ceux marqués « Mis en avant » dans <a href="#projets">Projets</a>.</p>' +
         fText("Bandeau : titre", b + "cta_title", h.cta_title, { wide: true }) + fText("Bandeau : texte", b + "cta_text", h.cta_text, { rows: 2, wide: true }) +
-        fText("Contact : titre", b + "contact_title", h.contact_title) + fText("Contact : texte", b + "contact_text", h.contact_text, { rows: 2, wide: true })),
+        fText("Contact : sur-titre", b + "contact_eyebrow", h.contact_eyebrow) + fText("Contact : titre", b + "contact_title", h.contact_title) +
+        fText("Contact : texte", b + "contact_text", h.contact_text, { rows: 2, wide: true }) +
+        fText("Contact : texte sous le nom de l’entreprise", b + "contact_intro", h.contact_intro, { rows: 2, wide: true, help: "Les libellés du formulaire se modifient dans Textes communs." })),
       "", null, "Page d’accueil");
   }
 
@@ -208,9 +220,10 @@
     }).join("") + "</div>" + formWrap("form-content",
       card("Carte sur l’accueil", fText("Nom court", b + "short", m.short) + fText("Numéro", b + "num", m.num) +
         fText("Accroche de la carte", b + "card_text", m.card_text, { rows: 2, wide: true }) + fLines("Points clés de la carte", b + "card_points", m.card_points)) +
-      card("Référencement", fText("Titre (Google et titre de section)", b + "seo_title", m.seo_title, { max: 60, wide: true }) +
+      card("Référencement", fText("Titre de la page (Google)", b + "seo_title", m.seo_title, { max: 60, wide: true }) +
         fText("Description (Google)", b + "seo_description", m.seo_description, { rows: 2, max: 160, wide: true })) +
       card("En-tête de page", fText("Sur-titre", b + "eyebrow", m.eyebrow, { wide: true }) + fText("Titre principal (H1)", b + "h1", m.h1, { rows: 2, wide: true }) +
+        fText("Titre de la section d’introduction", b + "intro_title", m.intro_title, { wide: true }) +
         fImage("Image de fond", b + "hero_image", m.hero_image)) +
       card("Introduction", fText("Texte", b + "intro", m.intro, { rows: 6, wide: true, help: "Laissez une ligne vide entre deux paragraphes." }) +
         fImage("Image", b + "split_image", m.split_image) +
@@ -240,7 +253,7 @@
   function vProjet(id) {
     var p = state.projects.filter(function (x) { return x.id === id; })[0];
     var isNew = !p;
-    p = p || { id: "", category: "travaux", title: "", client: "", role: "", duration: "", budget: "", budget_note: "", status: "works", image: "img/nrl-m24-possession.jpg", image_type: "photo", description: "", featured: false, visible: true };
+    p = p || { id: "", category: "travaux", title: "", client: "", role: "", duration: "", budget: "", budget_note: "", status: "works", image: "img/nrl-m24-possession.jpg", image_alt: "", image_type: "photo", description: "", featured: false, visible: true };
     return '<p class="back"><a href="#projets">← Retour à la liste</a></p><h1>' + (isNew ? "Ajouter un projet" : "Modifier le projet") + "</h1>" +
       formWrap("form-project",
         '<input type="hidden" data-pid value="' + esc(p.id) + '">' +
@@ -252,6 +265,7 @@
           fText("Précision sur le montant", "budget_note", p.budget_note, { help: "Facultatif. Ex. : dont lot battage 11 M€" }) +
           fText("Description", "description", p.description, { rows: 4, wide: true })) +
         card("Image", fImage("Image du projet", "image", p.image) +
+          fText("Texte alternatif de l’image", "image_alt", p.image_alt, { max: 125, wide: true, help: "Décrit l’image pour Google et les lecteurs d’écran. Vide : le titre du projet est utilisé." }) +
           fSelect("Type d’image", "image_type", p.image_type, { photo: "Photo de chantier", visual: "Visuel de projet (perspective, rendu 3D)", none: "Sans étiquette" }, "Les perspectives doivent être signalées comme « Visuel de projet ».")) +
         card("Affichage", fCheck("Afficher sur le site", "visible", p.visible) + fCheck("Mettre en avant sur l’accueil", "featured", p.featured)),
         "references", isNew ? "Ajouter le projet" : "Enregistrer et publier");
@@ -260,26 +274,77 @@
   function vReferences() {
     var r = state.content.references, b = "references.";
     return "<h1>Page Références</h1><p class=\"intro\">Textes de la page. Les fiches projets se gèrent dans <a href=\"#projets\">Projets / références</a>.</p>" + formWrap("form-content",
-      card("Référencement", fText("Titre de la page (Google)", b + "seo_title", r.seo_title, { max: 70, wide: true }) + fText("Description (Google)", b + "seo_description", r.seo_description, { rows: 2, max: 160, wide: true })) +
-      card("Contenu", fText("Titre", b + "title", r.title, { wide: true }) + fText("Texte d’introduction", b + "text", r.text, { rows: 3, wide: true }) +
+      card("Référencement", fText("Titre de la page (Google)", b + "seo_title", r.seo_title, { max: 60, wide: true }) + fText("Description (Google)", b + "seo_description", r.seo_description, { rows: 2, max: 160, wide: true })) +
+      card("Contenu", fText("Sur-titre et fil d’Ariane", b + "eyebrow", r.eyebrow) + fText("Titre", b + "title", r.title, { wide: true }) + fText("Texte d’introduction", b + "text", r.text, { rows: 3, wide: true }) +
         fImage("Image de fond", b + "hero_image", r.hero_image) +
+        fRepeater("Chiffres clés", b + "stats", r.stats, { prefix: ["Préfixe"], value: ["Valeur"], label: ["Libellé"] }, "Ajouter un chiffre") +
         fText("Titre de la rubrique Études", b + "group_etudes", r.group_etudes, { wide: true }) + fText("Titre de la rubrique Travaux", b + "group_travaux", r.group_travaux, { wide: true }) +
         fText("Note de bas de page", b + "note", r.note, { rows: 3, wide: true }) +
-        fText("Bandeau : titre", b + "cta_title", r.cta_title, { wide: true }) + fText("Bandeau : texte", b + "cta_text", r.cta_text, { rows: 2, wide: true })),
+        fText("Bandeau : titre", b + "cta_title", r.cta_title, { wide: true }) + fText("Bandeau : texte", b + "cta_text", r.cta_text, { rows: 2, wide: true })) +
+      card("Étiquettes des fiches projets", fText("Statut « Offre remportée »", b + "status_won", r.status_won) + fText("Statut « Offre non retenue »", b + "status_lost", r.status_lost) +
+        fText("Statut « Chantier réalisé »", b + "status_works", r.status_works) + fText("Statut « Opération en cours »", b + "status_prep", r.status_prep) +
+        fText("Étiquette des visuels de projet", b + "badge_visual", r.badge_visual) + fText("Étiquette des photos de chantier", b + "badge_photo", r.badge_photo) +
+        '<p class="help wide">Textes affichés sur les fiches de la page Références. Le choix du statut de chaque projet se fait dans <a href="#projets">Projets / références</a>.</p>'),
       "references", null, "Page Références");
   }
 
   function vInfos() {
     var s = state.content.site, l = state.content.legal;
     return "<h1>Coordonnées et mentions légales</h1>" + formWrap("form-content",
+      card("Référencement de la page Mentions légales", fText("Titre de la page (Google)", "legal.seo_title", l.seo_title, { max: 60, wide: true }) + fText("Description (Google)", "legal.seo_description", l.seo_description, { rows: 2, max: 160, wide: true })) +
+      card("Identité", fText("Nom de l’entreprise", "site.name", s.name, { help: "Titre du bloc contact, pied de page, onglet du navigateur." }) +
+        fText("Signature", "site.tagline", s.tagline, { help: "Texte associé au logo (lecteurs d’écran, Google)." })) +
       card("Coordonnées (pied de page, contact)", fText("Téléphone", "site.phone", s.phone) + fText("E-mail (reçoit les demandes du formulaire)", "site.email", s.email, { type: "email" }) +
         fText("Zone d’intervention", "site.zone", s.zone) + fText("Adresse du site", "site.domain", s.domain, { help: "Affichée dans le pied de page." }) +
         fText("Texte du pied de page", "site.footer_text", s.footer_text, { rows: 2, wide: true })) +
       card("Mentions légales", fText("Raison sociale", "legal.company", l.company) + fText("Forme juridique et capital", "legal.legal_form", l.legal_form) +
         fText("Adresse du siège", "legal.address", l.address, { wide: true }) + fText("SIRET", "legal.siret", l.siret) + fText("Directeur de la publication", "legal.director", l.director) +
         fText("Hébergeur", "legal.host", l.host, { rows: 2, wide: true }) + fText("Conception du site", "legal.designer", l.designer) +
-        '<p class="help wide">Les valeurs encore entre crochets [ ] sont surlignées en jaune sur la page Mentions légales.</p>'),
+        '<p class="help wide">Les valeurs encore entre crochets [ ] sont surlignées en jaune sur la page Mentions légales.</p>') +
+      card("Textes de la page Mentions légales", fText("Titre de la page", "legal.title", l.title) + fText("Titre : éditeur", "legal.editor_title", l.editor_title) +
+        fText("Libellé : siège", "legal.label_address", l.label_address) + fText("Libellé : SIRET", "legal.label_siret", l.label_siret) +
+        fText("Libellé : e-mail", "legal.label_email", l.label_email) + fText("Libellé : téléphone", "legal.label_phone", l.label_phone) +
+        fText("Libellé : directeur de la publication", "legal.label_director", l.label_director) + fText("Titre : conception", "legal.designer_title", l.designer_title) +
+        fText("Titre : hébergement", "legal.host_title", l.host_title) +
+        fText("Titre : propriété intellectuelle", "legal.ip_title", l.ip_title, { wide: true }) + fText("Texte : propriété intellectuelle", "legal.ip_text", l.ip_text, { rows: 4, wide: true }) +
+        fText("Titre : données personnelles", "legal.privacy_title", l.privacy_title, { wide: true }) + fText("Texte : données personnelles", "legal.privacy_text", l.privacy_text, { rows: 6, wide: true }) +
+        fText("Titre : cookies", "legal.cookies_title", l.cookies_title, { wide: true }) + fText("Texte : cookies", "legal.cookies_text", l.cookies_text, { rows: 3, wide: true }) +
+        '<p class="help wide">Dans les textes, {societe} est remplacé par la raison sociale et {email} par l’adresse e-mail (cliquable).</p>'),
       "mentions-legales", null, "Coordonnées et mentions");
+  }
+
+  function vTextes() {
+    var u = state.content.ui, b = "ui.";
+    function t(label, key, o) { return fText(label, b + key, u[key], o); }
+    return "<h1>Textes communs</h1><p class=\"intro\">Libellés présents sur plusieurs pages : menu, boutons, pied de page, formulaire de contact, page d’erreur.</p>" + formWrap("form-content",
+      card("Menu et barre mobile", t("Menu : accueil", "nav_home") + t("Menu : études techniques", "nav_etudes-techniques") +
+        t("Menu : préparation", "nav_preparation-chantier") + t("Menu : direction de travaux", "nav_direction-travaux") +
+        t("Menu : références", "nav_references") + t("Menu : bouton contact", "nav_contact") + t("Menu : administration", "nav_admin") +
+        t("Barre mobile : appeler", "mobile_call") + t("Barre mobile : écrire", "mobile_write")) +
+      card("Boutons et bandeaux", t("Bouton des bandeaux « appel à l’action »", "cta_button", { wide: true }) +
+        t("Lien des cartes missions (accueil)", "mission_more")) +
+      card("Pages missions (blocs communs)", t("Fil d’Ariane : missions", "mission_crumb") + t("Prestations : sur-titre", "mission_services_eyebrow") +
+        t("Prestations : titre", "mission_services_title", { wide: true }) + t("Titre de l’objectif", "mission_objective_title") +
+        t("Autres missions : sur-titre", "mission_others_eyebrow") + t("Autres missions : titre", "mission_others_title", { wide: true }) +
+        t("Autres missions : libellé devant le numéro", "mission_others_label")) +
+      card("Pied de page", t("Titre : missions", "footer_missions") + t("Titre : le cabinet", "footer_cabinet") +
+        t("Lien : présentation", "footer_presentation") + t("Lien : références", "footer_references") + t("Lien : contact", "footer_contact_link") +
+        t("Lien : mentions légales", "footer_legal") + t("Titre : contact", "footer_contact") + t("Mention de copyright", "footer_rights")) +
+      card("Formulaire de contact", t("Champ : nom", "form_name") + t("Champ : entreprise", "form_company") + t("Champ : e-mail", "form_email") +
+        t("Champ : téléphone", "form_phone") + t("Libellé : zone d’intervention", "contact_zone") + t("Champ : type de mission", "form_mission") +
+        t("Choix vide du type de mission", "form_mission_placeholder") +
+        fLines("Choix du type de mission", b + "form_missions", u.form_missions) +
+        t("Champ : message", "form_message") + t("Exemple dans le champ message", "form_message_placeholder", { wide: true }) +
+        t("Case de consentement", "form_consent", { rows: 2, wide: true }) + t("Lien de la case de consentement", "form_consent_link") +
+        t("Bouton d’envoi", "form_submit")) +
+      card("Messages du formulaire", t("Demande envoyée", "msg_ok", { wide: true }) + t("Échec de l’envoi", "msg_error", { wide: true }) +
+        t("Trop de demandes", "msg_limit", { wide: true }) + t("Champs à vérifier", "msg_check", { wide: true }) +
+        t("Envoi en cours", "msg_sending") + t("Connexion impossible", "msg_network", { wide: true }) +
+        t("Champ obligatoire vide", "err_required") + t("Consentement manquant", "err_consent") + t("E-mail invalide", "err_email") +
+        t("Téléphone invalide", "err_phone") + t("Choix invalide", "err_choice")) +
+      card("Page introuvable (erreur 404)", t("Sur-titre", "notfound_eyebrow") + t("Fil d’Ariane et onglet", "notfound_crumb") +
+        t("Titre", "notfound_title", { wide: true }) + t("Texte", "notfound_text", { rows: 2, wide: true }) + t("Bouton", "notfound_button")),
+      "", null, "Textes communs");
   }
 
   function vMessages() {
@@ -323,12 +388,18 @@
 
   function vCompte() {
     var u = state.user;
-    return "<h1>Mon compte</h1><p class=\"intro\">Connecté en tant que <b>" + esc(u.name || u.email) + "</b> (" + esc(u.email) + ").</p>" +
-      '<form class="edit-form" id="form-password" novalidate>' + card("Changer de mot de passe",
-        '<div class="fld"><label for="pw-cur">Mot de passe actuel</label><input id="pw-cur" type="password" name="current" autocomplete="current-password" required></div>' +
-        '<div class="fld"><label for="pw-new">Nouveau mot de passe</label><input id="pw-new" type="password" name="password" autocomplete="new-password" minlength="12" required><small class="help">12 caractères minimum, avec des lettres et des chiffres.</small></div>' +
-        '<div class="fld"><label for="pw-conf">Confirmation</label><input id="pw-conf" type="password" name="confirm" autocomplete="new-password" required></div>') +
-      '<div class="save-bar"><button class="btn-main" type="submit">Changer le mot de passe</button></div></form>';
+    return '<h1>Mon compte</h1><p class="intro">Gérez votre nom, votre adresse de connexion et votre mot de passe.</p><div class="account">' +
+      '<form class="edit-form" id="form-profile" novalidate>' + card("Profil",
+        '<div class="fld"><label for="pf-name">Nom affiché</label><input id="pf-name" type="text" name="name" value="' + esc(u.name) + '" maxlength="120" autocomplete="name" required></div>' +
+        '<div class="fld"><label for="pf-email">Adresse e-mail de connexion</label><input id="pf-email" type="email" name="email" value="' + esc(u.email) + '" maxlength="190" autocomplete="username" required></div>' +
+        '<div class="fld wide" id="pf-confirm" hidden><label for="pf-cur">Mot de passe actuel</label><input id="pf-cur" type="password" name="current" autocomplete="current-password"><small class="help">Requis pour changer l’adresse de connexion.</small></div>' +
+        '<div class="card-actions"><button class="btn-main" type="submit">Enregistrer le profil</button></div>') + "</form>" +
+      '<form class="edit-form" id="form-password" novalidate>' + card("Mot de passe",
+        '<div class="fld wide"><label for="pw-cur">Mot de passe actuel</label><input id="pw-cur" type="password" name="current" autocomplete="current-password" required></div>' +
+        '<div class="fld"><label for="pw-new">Nouveau mot de passe</label><input id="pw-new" type="password" name="password" autocomplete="new-password" minlength="12" required></div>' +
+        '<div class="fld"><label for="pw-conf">Confirmation</label><input id="pw-conf" type="password" name="confirm" autocomplete="new-password" required></div>' +
+        '<small class="help wide">12 caractères minimum, avec des lettres et des chiffres.</small>' +
+        '<div class="card-actions"><button class="btn-main" type="submit">Changer le mot de passe</button></div>') + "</form></div>";
   }
 
   /* =================================================================
@@ -350,6 +421,7 @@
       case "projet": html = vProjet(arg); tab = "projets"; break;
       case "references": html = vReferences(); break;
       case "infos": html = vInfos(); break;
+      case "textes": html = vTextes(); break;
       case "messages": html = vMessages(); break;
       case "historique": html = vHistorique(); break;
       case "compte": html = vCompte(); break;
@@ -372,14 +444,45 @@
       var upd = function () { c.textContent = f.value.length + " / " + max + " caractères conseillés"; c.classList.toggle("over", f.value.length > max); };
       f.addEventListener("input", upd); upd();
     });
-    var form = view.querySelector("form.edit-form");
-    if (form) {
-      if (form.id !== "form-password") {
+    view.querySelectorAll("form.edit-form").forEach(function (form) {
+      if (form.id !== "form-password" && form.id !== "form-profile") {
         form.addEventListener("input", markDirty);
         form.addEventListener("change", markDirty);
       }
       form.addEventListener("submit", onSubmit);
-    }
+    });
+    var email = document.getElementById("pf-email");
+    if (email) email.addEventListener("input", toggleProfileConfirm);
+    view.querySelectorAll('input[type="password"]').forEach(addPasswordToggle);
+  }
+  var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>';
+  function setPasswordVisible(input, btn, visible) {
+    input.type = visible ? "text" : "password";
+    btn.setAttribute("aria-pressed", String(visible));
+    btn.setAttribute("aria-label", visible ? "Masquer le mot de passe" : "Afficher le mot de passe");
+    btn.title = btn.getAttribute("aria-label");
+    btn.innerHTML = EYE + (visible ? '<path d="M3 3l18 18"/>' : "") + "</svg>";
+  }
+  function addPasswordToggle(input) {
+    var wrap = document.createElement("div");
+    wrap.className = "pw-field";
+    input.insertAdjacentElement("beforebegin", wrap);
+    wrap.appendChild(input);
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "pw-toggle";
+    wrap.appendChild(btn);
+    setPasswordVisible(input, btn, false);
+    btn.addEventListener("click", function () { setPasswordVisible(input, btn, input.type === "password"); });
+  }
+  /** Après enregistrement, les mots de passe ne restent pas affichés en clair. */
+  function maskPasswords(form) {
+    form.querySelectorAll(".pw-field").forEach(function (w) { setPasswordVisible(w.querySelector("input"), w.querySelector("button"), false); });
+  }
+  /** Le mot de passe actuel n'est demandé que si l'adresse de connexion change. */
+  function toggleProfileConfirm() {
+    var email = document.getElementById("pf-email").value.trim().toLowerCase();
+    document.getElementById("pf-confirm").hidden = email === state.user.email;
   }
   function markDirty() {
     dirty = true;
@@ -404,13 +507,28 @@
     if (busy) return;
     var form = e.target, req;
 
+    if (form.id === "form-profile") {
+      var pf = form.elements;
+      lock(form, true);
+      api("account/profile", { name: pf.name.value, email: pf.email.value, current: pf.current.value }).then(function (r) {
+        setCsrf(r.csrf);
+        state.user = r.user;
+        pf.name.value = r.user.name; pf.email.value = r.user.email; pf.current.value = "";
+        maskPasswords(form);
+        toggleProfileConfirm();
+        document.querySelector(".top-actions .user").textContent = r.user.name || r.user.email;
+        toast("Profil mis à jour.");
+      }).catch(function (err) { toast(err.message, "error"); }).then(function () { lock(form, false); });
+      return;
+    }
+
     if (form.id === "form-password") {
       var f = form.elements;
       if (f.password.value !== f.confirm.value) { toast("La confirmation ne correspond pas au nouveau mot de passe.", "error"); return; }
       lock(form, true);
       api("account/password", { current: f.current.value, password: f.password.value }).then(function (r) {
-        if (r.csrf) CSRF = r.csrf;
-        form.reset(); toast("Mot de passe modifié.");
+        setCsrf(r.csrf);
+        form.reset(); maskPasswords(form); toast("Mot de passe modifié.");
       }).catch(function (err) { toast(err.message, "error"); }).then(function () { lock(form, false); });
       return;
     }
@@ -467,6 +585,16 @@
     var t;
     if ((t = e.target.closest("[data-menu]"))) { document.body.classList.toggle("menu-open"); return; }
     if (document.body.classList.contains("menu-open") && !e.target.closest(".side")) document.body.classList.remove("menu-open");
+
+    // Outils de maintenance
+    if ((t = e.target.closest("[data-tool]"))) {
+      var tool = t, kind = tool.getAttribute("data-tool");
+      tool.disabled = true;
+      api("tools/" + kind, {}).then(function (r) {
+        toast(kind === "minify" ? "Fichiers allégés regénérés." : r.images + " images traitées, " + r.webp + " copies WebP créées.");
+      }).catch(function (err) { toast(err.message, "error"); }).then(function () { tool.disabled = false; });
+      return;
+    }
 
     // Listes répétables
     if ((t = e.target.closest("[data-add]"))) {

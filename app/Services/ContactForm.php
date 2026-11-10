@@ -15,7 +15,11 @@ use Throwable;
  */
 final class ContactForm
 {
-    public const MISSIONS = ['Études techniques / appel d’offres', 'Préparation de chantier', 'Direction de travaux / pilotage', 'Autre demande'];
+    /** Choix proposés dans le formulaire (modifiables dans l'administration, « Textes communs »). */
+    public static function missions(): array
+    {
+        return SiteContent::content()['ui']['form_missions'];
+    }
     public const MAX_PER_HOUR = 5;
     private const MIN_SECONDS = 3;
     private const MAX_SECONDS = 86400;
@@ -44,14 +48,15 @@ final class ContactForm
             return ['status' => 'ok', 'errors' => []];
         }
 
+        $ui = SiteContent::content()['ui'];
         $errors = [];
         foreach (['name' => 'nom', 'email' => 'email', 'mission' => 'mission', 'message' => 'message'] as $k => $field) {
-            if ($d[$k] === '') $errors[$field] = 'Ce champ est requis.';
+            if ($d[$k] === '') $errors[$field] = $ui['err_required'];
         }
-        if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) $errors['email'] = 'Adresse e-mail invalide.';
-        if ($d['phone'] !== '' && !preg_match('/^[0-9 +().-]{8,20}$/', $d['phone'])) $errors['telephone'] = 'Numéro de téléphone invalide.';
-        if ($d['mission'] !== '' && !in_array($d['mission'], self::MISSIONS, true)) $errors['mission'] = 'Choix invalide.';
-        if (empty($in['rgpd'])) $errors['rgpd'] = 'Merci d’accepter pour envoyer votre demande.';
+        if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) $errors['email'] = $ui['err_email'];
+        if ($d['phone'] !== '' && !preg_match('/^[0-9 +().-]{8,20}$/', $d['phone'])) $errors['telephone'] = $ui['err_phone'];
+        if ($d['mission'] !== '' && !in_array($d['mission'], self::missions(), true)) $errors['mission'] = $ui['err_choice'];
+        if (empty($in['rgpd'])) $errors['rgpd'] = $ui['err_consent'];
         if ($errors) return ['status' => 'erreur', 'errors' => $errors];
 
         if (Message::countRecentFromIp($ip, 60) >= self::MAX_PER_HOUR) return ['status' => 'limite', 'errors' => []];

@@ -11,12 +11,13 @@ use App\Services\SiteContent;
 abstract class SiteController extends Controller
 {
     /**
-     * @param array $meta title, description, path (canonique), nav (menu actif), noindex, jsonld
+     * @param array $meta title, description, excerpt (texte de repli de la description), path (canonique), nav (menu actif), noindex, jsonld
      */
     protected function page(string $template, array $meta, array $data = [], int $status = 200): Response
     {
         $content = SiteContent::content();
-        $meta += ['description' => '', 'path' => '', 'nav' => null, 'noindex' => false, 'jsonld' => false];
+        $meta += ['description' => '', 'excerpt' => '', 'path' => '', 'nav' => null, 'noindex' => false, 'jsonld' => false];
+        if ($meta['description'] === '') $meta['description'] = excerpt($meta['excerpt']);
         return $this->view('pages/' . $template, $data + ['c' => $content, 'meta' => $meta], 'layouts/site', $status);
     }
 }

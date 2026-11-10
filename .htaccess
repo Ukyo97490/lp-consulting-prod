@@ -9,3 +9,8 @@ Options -Indexes
 <IfModule !mod_rewrite.c>
   Require all denied
 </IfModule>
+
+# Fichiers sensibles : jamais servis
+<FilesMatch "(\.(sql|env|log|ini|bak)|^config(\.[a-z]+)?\.php|^composer\.json|^README\.md)$">
+  Require all denied
+</FilesMatch>

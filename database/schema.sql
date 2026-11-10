@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS projects (
   duration    VARCHAR(120) NOT NULL DEFAULT '',
   budget      VARCHAR(60)  NOT NULL DEFAULT '',
   budget_note VARCHAR(255) NOT NULL DEFAULT '',
-  status      ENUM('won','lost','works') NOT NULL DEFAULT 'works',
+  status      ENUM('won','lost','works','prep') NOT NULL DEFAULT 'works',
   image       VARCHAR(255) NOT NULL DEFAULT '',
+  image_alt   VARCHAR(255) NOT NULL DEFAULT '',
   image_type  ENUM('photo','visual','none') NOT NULL DEFAULT 'photo',
   description TEXT         NOT NULL,
   featured    TINYINT(1)   NOT NULL DEFAULT 0,
@@ -34,6 +35,15 @@ CREATE TABLE IF NOT EXISTS projects (
   PRIMARY KEY (id),
   UNIQUE KEY uq_projects_slug (slug),
   KEY ix_projects_position (position)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dimensions des images (attributs width et height).
+CREATE TABLE IF NOT EXISTS image_meta (
+  path       VARCHAR(255) NOT NULL,
+  width      INT UNSIGNED NOT NULL DEFAULT 0,
+  height     INT UNSIGNED NOT NULL DEFAULT 0,
+  updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (path)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Comptes d'administration.

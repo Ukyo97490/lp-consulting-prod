@@ -14,7 +14,7 @@ $message ??= null;
 <body>
   <main class="section">
     <div class="wrap">
-      <img src="<?= e(url('img/logo.png')) ?>" alt="LP CONSULTING" width="240" style="height:auto">
+      <img src="<?= e(url('img/logo.png')) ?>" alt="LP CONSULTING" width="240" height="112" style="height:auto">
       <h1 style="margin-top:32px"><?= e($message ?: 'Service momentanément indisponible') ?></h1>
       <p>Merci de réessayer dans quelques instants. Vous pouvez aussi nous écrire à <a href="mailto:contact@lp-consulting.re">contact@lp-consulting.re</a>.</p>
       <p style="margin-top:24px"><a class="btn btn-primary" href="<?= e(url()) ?>">Retour à l’accueil</a></p>

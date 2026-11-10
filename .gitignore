@@ -4,3 +4,4 @@
 /public/uploads/*
 !/public/uploads/.gitkeep
 !/public/uploads/.htaccess
+/local-server/

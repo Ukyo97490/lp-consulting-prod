@@ -36,6 +36,11 @@ final class AdminUser extends Model
         );
     }
 
+    public static function updateProfile(int $id, string $name, string $email): void
+    {
+        Database::exec('UPDATE admin_users SET name = ?, email = ? WHERE id = ?', [$name, $email, $id]);
+    }
+
     public static function updatePassword(int $id, string $hash): void
     {
         Database::exec('UPDATE admin_users SET password_hash = ? WHERE id = ?', [$hash, $id]);

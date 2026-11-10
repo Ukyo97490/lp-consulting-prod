@@ -11,6 +11,15 @@ use App\Services\Auth;
 
 final class AccountController extends Controller
 {
+    public function profile(): Response
+    {
+        $in = $this->request->json();
+        $error = Auth::updateProfile((int) Auth::id(), (string) ($in['name'] ?? ''), (string) ($in['email'] ?? ''), (string) ($in['current'] ?? ''));
+        if ($error !== null) throw new HttpException(422, $error);
+        // La session est régénérée si l'e-mail change : l'interface reçoit le jeton CSRF à jour.
+        return $this->json(['ok' => true, 'user' => Auth::user(), 'csrf' => Session::csrfToken()]);
+    }
+
     public function password(): Response
     {
         $in = $this->request->json();

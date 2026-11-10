@@ -4,11 +4,13 @@ $r = $c['references'];
 ?>
 <?= partial('page-hero', [
     'image'   => $r['hero_image'],
-    'crumbs'  => ['Accueil' => url(), 'Références' => null],
-    'eyebrow' => 'Références',
+    'crumbs'  => [$c['ui']['nav_home'] => url(), $r['eyebrow'] => null],
+    'eyebrow' => $r['eyebrow'],
     'title'   => $r['title'],
     'text'    => $r['text'],
 ]) ?>
+
+<?= partial('stats', ['items' => $r['stats']]) ?>
 
 <section class="section">
   <div class="wrap">
@@ -17,7 +19,7 @@ $r = $c['references'];
       <h2 class="ref-group-title"><?= e($group['title']) ?></h2>
       <div class="ref-grid">
 <?php foreach ($group['projects'] as $i => $p): ?>
-        <?= partial('project-card', ['p' => $p, 'i' => $i]) ?>
+        <?= partial('project-card', ['p' => $p, 'i' => $i, 'r' => $r]) ?>
 <?php endforeach ?>
       </div>
     </div>
@@ -26,4 +28,4 @@ $r = $c['references'];
   </div>
 </section>
 
-<?= partial('cta', ['title' => $r['cta_title'], 'text' => $r['cta_text']]) ?>
+<?= partial('cta', ['title' => $r['cta_title'], 'text' => $r['cta_text'], 'button' => $c['ui']['cta_button']]) ?>

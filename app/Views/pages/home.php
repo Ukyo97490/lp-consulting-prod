@@ -10,39 +10,28 @@ use App\Services\ContentSchema;
 
 $h = $c['home'];
 $s = $c['site'];
+$ui = $c['ui'];
 $link = safe_link($h['expertise_link']);
 $figures = $h['expertise_figures'];
 ?>
+<?php preload_image($h['hero_image']) ?>
 <section class="hero on-dark">
-  <div class="hero-media" style="background-image:url('<?= e(img_url($h['hero_image'])) ?>')" role="img" aria-label="Photo de chantier"></div>
+  <div class="hero-media"><?= picture($h['hero_image'], image_alt($h['hero_image'], 'Photo de chantier'), ['fetchpriority' => 'high', 'sizes' => '100vw']) ?></div>
   <div class="wrap">
     <div class="hero-content">
       <span class="eyebrow"><?= e($h['hero_eyebrow']) ?></span>
       <h1><?= e($h['hero_title']) ?> <em><?= e($h['hero_highlight']) ?></em></h1>
       <p class="hero-lead"><?= e($h['hero_lead']) ?></p>
       <div class="hero-actions">
-        <a class="btn btn-sky" href="#missions">Découvrir les missions <?= icon('arrow') ?></a>
-        <a class="btn btn-ghost" href="#contact">Contacter LP CONSULTING</a>
+        <a class="btn btn-sky" href="#missions"><?= e($h['hero_btn_missions']) ?> <?= icon('arrow') ?></a>
+        <a class="btn btn-ghost" href="#contact"><?= e($h['hero_btn_contact']) ?></a>
       </div>
       <div class="hero-tags"><?php foreach ($h['hero_tags'] as $tag): ?><span><?= e($tag) ?></span><?php endforeach ?></div>
     </div>
   </div>
-  <img class="hero-mark" src="<?= e(url('img/logo-mark-blanc.png')) ?>" alt="" aria-hidden="true">
 </section>
 
-<section class="stats" aria-label="Chiffres clés">
-  <div class="wrap">
-    <div class="stats-grid">
-<?php foreach ($h['stats'] as $st):
-    $prefix = trim((string) $st['prefix']);
-    $prefix = $prefix !== '' ? $prefix . ' ' : '';
-    $animated = ctype_digit((string) $st['value']) && (int) $st['value'] < 1900; // les années ne sont pas animées
-?>
-      <div class="stat"><strong<?php if ($animated): ?> data-count="<?= e($st['value']) ?>" data-prefix="<?= e($prefix) ?>"<?php endif ?>><?= e($prefix . $st['value']) ?></strong><span><?= e($st['label']) ?></span></div>
-<?php endforeach ?>
-    </div>
-  </div>
-</section>
+<?= partial('stats', ['items' => $h['stats']]) ?>
 
 <section class="section" id="presentation">
   <div class="wrap about-grid">
@@ -60,11 +49,11 @@ $figures = $h['expertise_figures'];
     </div>
     <aside class="about-aside reveal reveal-delay-2">
       <figure class="about-figure">
-        <img src="<?= e(img_url($h['about_image'])) ?>" alt="Grands chantiers d’infrastructure et de bâtiment" loading="lazy" style="object-position:30% center">
+        <?= picture($h['about_image'], image_alt($h['about_image'], 'Grands chantiers d’infrastructure et de bâtiment'), ['style' => 'object-position:30% center', 'sizes' => '(max-width: 960px) min(520px, 100vw), 420px']) ?>
         <figcaption><?= e($h['about_caption']) ?></figcaption>
       </figure>
       <div class="groups">
-        <p>Expérience au sein de</p>
+        <p><?= e($h['groups_title']) ?></p>
         <ul><?php foreach ($h['groups'] as $g): ?><li><?= e($g) ?></li><?php endforeach ?></ul>
       </div>
     </aside>
@@ -86,7 +75,7 @@ $figures = $h['expertise_figures'];
         <h3><?= e($m['short']) ?></h3>
         <p><?= e($m['card_text']) ?></p>
         <ul><?php foreach ($m['card_points'] as $pt): ?><li><?= e($pt) ?></li><?php endforeach ?></ul>
-        <span class="more">En savoir plus <?= icon('arrow') ?></span>
+        <span class="more"><?= e($ui['mission_more']) ?> <?= icon('arrow') ?></span>
       </a>
 <?php endforeach ?>
     </div>
@@ -121,33 +110,33 @@ $figures = $h['expertise_figures'];
     </div>
     <div class="ref-strip reveal">
 <?php foreach ($featured as $p): ?>
-      <a href="<?= e(url('references')) ?>"><img src="<?= e(img_url($p['image'])) ?>" alt="" loading="lazy"><span><?= e($p['title']) ?><small><?= e($p['role']) ?> · <?= e($p['budget']) ?></small></span></a>
+      <a href="<?= e(url('references')) ?>"><?= picture($p['image'], project_alt($p), ['sizes' => '(max-width: 960px) 50vw, 300px']) ?><span><?= e($p['title']) ?><small><?= e($p['role']) ?> · <?= e($p['budget']) ?></small></span></a>
 <?php endforeach ?>
     </div>
-    <p style="margin-top:32px"><a class="btn btn-outline" href="<?= e(url('references')) ?>">Voir toutes les références <?= icon('arrow') ?></a></p>
+    <p style="margin-top:32px"><a class="btn btn-outline" href="<?= e(url('references')) ?>"><?= e($h['refs_button']) ?> <?= icon('arrow') ?></a></p>
   </div>
 </section>
 
-<?= partial('cta', ['title' => $h['cta_title'], 'text' => $h['cta_text']]) ?>
+<?= partial('cta', ['title' => $h['cta_title'], 'text' => $h['cta_text'], 'button' => $ui['cta_button']]) ?>
 
 <section class="section section-mist" id="contact">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="eyebrow">Contact</span>
+      <span class="eyebrow"><?= e($h['contact_eyebrow']) ?></span>
       <h2><?= e($h['contact_title']) ?></h2>
       <p><?= e($h['contact_text']) ?></p>
     </div>
     <div class="contact-grid">
       <div class="contact-info reveal">
         <h3><?= e($s['name']) ?></h3>
-        <p>Études techniques, préparation de chantier et direction de travaux pour les entreprises du BTP.</p>
+        <p><?= e($h['contact_intro']) ?></p>
         <ul class="contact-list">
-          <li><?= icon('mail') ?><div><small>E-mail</small><a href="mailto:<?= e($s['email']) ?>"><?= e($s['email']) ?></a></div></li>
-          <li><?= icon('phone') ?><div><small>Téléphone</small><a href="tel:<?= e(tel_href($s['phone'])) ?>"><?= e($s['phone']) ?></a></div></li>
-          <li><?= icon('pin') ?><div><small>Zone d’intervention</small><span><?= e($s['zone']) ?></span></div></li>
+          <li><?= icon('mail') ?><div><small><?= e($ui['form_email']) ?></small><a href="mailto:<?= e($s['email']) ?>"><?= e($s['email']) ?></a></div></li>
+          <li><?= icon('phone') ?><div><small><?= e($ui['form_phone']) ?></small><a href="tel:<?= e(tel_href($s['phone'])) ?>"><?= e($s['phone']) ?></a></div></li>
+          <li><?= icon('pin') ?><div><small><?= e($ui['contact_zone']) ?></small><span><?= e($s['zone']) ?></span></div></li>
         </ul>
       </div>
-      <?= partial('contact-form', ['status' => $contactStatus, 'token' => $contactToken, 'missions' => $missions]) ?>
+      <?= partial('contact-form', ['status' => $contactStatus, 'token' => $contactToken, 'missions' => $missions, 'ui' => $ui]) ?>
     </div>
   </div>
 </section>

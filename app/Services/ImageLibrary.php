@@ -20,6 +20,8 @@ final class ImageLibrary
             foreach (glob(PUBLIC_PATH . '/' . $dir . '/*') ?: [] as $file) {
                 $name = basename($file);
                 if ($dir === 'img' && preg_match('/^(logo|og-image)/', $name)) continue;
+                if (str_ends_with($name, '.webp') && glob(substr($file, 0, -5) . '.{jpg,jpeg,png}', GLOB_BRACE)) continue; // copie WebP d'une image de la liste
+                if (preg_match('/^(.+)-\d+w\.webp$/', $name, $m) && glob(dirname($file) . '/' . $m[1] . '.{jpg,jpeg,png}', GLOB_BRACE)) continue; // variante réduite (srcset)
                 if (ContentSchema::isImagePath($dir . '/' . $name)) $out[] = $dir . '/' . $name;
             }
         }

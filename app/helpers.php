@@ -24,8 +24,13 @@ function abs_url(string $path = ''): string
 /** Ressource statique avec empreinte de version (cache navigateur long sans fichier périmé). */
 function asset(string $path): string
 {
-    $file = PUBLIC_PATH . '/' . ltrim($path, '/');
-    return url($path) . (is_file($file) ? '?v=' . filemtime($file) : '');
+    $source = PUBLIC_PATH . '/' . ltrim($path, '/');
+    $min = (string) preg_replace('/\.(css|js)$/', '.min.$1', $source);
+    // Le fichier .min n'est servi que s'il est à jour : sinon une modification de la source serait ignorée.
+    if ($min !== $source && is_file($min) && (!is_file($source) || filemtime($min) >= filemtime($source))) {
+        return url(substr($min, strlen(PUBLIC_PATH) + 1)) . '?v=' . filemtime($min);
+    }
+    return url($path) . (is_file($source) ? '?v=' . filemtime($source) : '');
 }
 
 function partial(string $name, array $data = []): string
@@ -64,6 +69,93 @@ function safe_link(?string $href): string
 function img_url(?string $path): string
 {
     return App\Services\ContentSchema::isImagePath($path) ? url((string) $path) : url('img/bandeau-chantiers.jpg');
+}
+
+/**
+ * Image en <picture> : copies WebP en srcset (variantes 320 à 1600 px), dimensions réelles, chargement différé.
+ * $attrs['sizes'] : largeur d'affichage pour le choix de la variante (100vw par défaut).
+ * Sans fetchpriority, l'image est en loading="lazy".
+ */
+function picture(?string $path, string $alt, array $attrs = []): string
+{
+    $path = App\Services\ContentSchema::isImagePath($path) ? (string) $path : 'img/bandeau-chantiers.jpg';
+    $info = App\Services\ImageOptimizer::info($path);
+    $sizes = (string) ($attrs['sizes'] ?? '100vw');
+    unset($attrs['sizes']);
+    $attrs = ['src' => url($path), 'alt' => $alt, 'width' => $info['width'], 'height' => $info['height']] + $attrs;
+    if (!isset($attrs['fetchpriority'])) $attrs += ['loading' => 'lazy'];
+    $attrs += ['decoding' => 'async'];
+
+    $html = '';
+    foreach ($attrs as $name => $value) {
+        if ($value !== 0) $html .= ' ' . $name . '="' . e((string) $value) . '"';
+    }
+    $srcset = webp_srcset($path);
+    $source = $srcset !== '' ? '<source type="image/webp" srcset="' . e($srcset) . '" sizes="' . e($sizes) . '">' : '';
+    return '<picture>' . $source . '<img' . $html . '></picture>';
+}
+
+/** Valeur srcset des copies WebP d'une image ("…-480w.webp 480w, …"), vide s'il n'y en a pas. */
+function webp_srcset(string $path): string
+{
+    $list = [];
+    foreach (App\Services\ImageOptimizer::srcset($path) as $w => $file) $list[] = url($file) . ' ' . $w . 'w';
+    return implode(', ', $list);
+}
+
+/**
+ * Précharge l'image principale de la page (LCP) : appelé par le gabarit de page, lu par la mise en page
+ * qui place la balise <link rel="preload"> dans le <head>, avant la feuille de style.
+ */
+function preload_image(?string $path = null, string $sizes = '100vw'): ?array
+{
+    static $preload = null;
+    if ($path !== null && App\Services\ContentSchema::isImagePath($path)) {
+        $preload = ['href' => url($path), 'srcset' => webp_srcset($path), 'sizes' => $sizes];
+    }
+    return $preload;
+}
+
+/**
+ * CSS critique à intégrer dans le <head> ('accueil' ou 'pages'), ou null s'il manque ou n'est plus à jour :
+ * la feuille complète bloque alors l'affichage, comme avant.
+ */
+function critical_css(string $set): ?string
+{
+    $file = PUBLIC_PATH . '/css/critical-' . $set . '.min.css';
+    $source = PUBLIC_PATH . '/css/style.css';
+    if (!is_file($file) || (is_file($source) && filemtime($file) < filemtime($source))) return null;
+    // Chemins relatifs à css/ rendus absolus, puisque le CSS est intégré dans la page.
+    return str_replace(['url("../', '</'], ['url("' . rtrim(url(''), '/') . '/', '<\/'], (string) file_get_contents($file));
+}
+
+/** Texte alternatif d'un projet : celui saisi dans l'administration, à défaut le titre du projet. */
+function project_alt(array $project): string
+{
+    return $project['image_alt'] !== '' ? $project['image_alt'] : $project['title'];
+}
+
+/** Texte alternatif d'une image de page : celui du projet qui l'utilise, à défaut le texte fourni. */
+function image_alt(?string $path, string $fallback): string
+{
+    static $alts = null;
+    if ($alts === null) {
+        $alts = [];
+        foreach (App\Services\SiteContent::projects() as $p) {
+            if ($p['image_alt'] !== '') $alts[$p['image']] ??= $p['image_alt'];
+        }
+    }
+    return $alts[$path] ?? $fallback;
+}
+
+/** Extrait propre : texte sur une ligne, coupé sur un mot entier, 155 caractères au plus. */
+function excerpt(string $text, int $max = 155): string
+{
+    $text = trim((string) preg_replace('/\s+/u', ' ', strip_tags($text)));
+    if (mb_strlen($text) <= $max) return $text;
+    $cut = mb_substr($text, 0, $max);
+    $space = mb_strrpos($cut, ' ');
+    return rtrim($space ? mb_substr($cut, 0, $space) : $cut, ' ,;:.');
 }
 
 const ICONS = [

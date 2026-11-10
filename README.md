@@ -53,16 +53,15 @@ prod/
 
 ## Tester en local (sans WAMP ni Docker)
 
-Il faut PHP 8.1 ou plus en ligne de commande, avec les extensions `pdo_mysql` et `mbstring`, et une base MySQL/MariaDB.
+Le dossier `local-server/` contient un serveur portable (PHP, MariaDB, phpMyAdmin), sans rien à installer sur le système. Il n'est pas versionné dans Git : il reste sur le poste de développement.
 
-```bash
-cd prod
-cp config/config.sample.php config/config.php   # puis renseigner la base, debug => true, url => http://localhost:8000
-php bin/install.php --admin=vous@exemple.re --name="Votre nom"
-php -S localhost:8000 -t public bin/dev-router.php
+```bat
+local-server\setup.cmd   & rem une seule fois : télécharge la stack
+local-server\start.cmd   & rem démarre tout et ouvre le navigateur
+local-server\stop.cmd    & rem arrête tout
 ```
 
-Ouvrir ensuite http://localhost:8000 pour le site et http://localhost:8000/admin pour l'administration.
+Ouvrir ensuite http://127.0.0.1:8010 pour le site et http://127.0.0.1:8010/admin pour l'administration. Accès et détails : `local-server/README.md`.
 
 ## Mise en production (o2switch)
 
@@ -84,7 +83,7 @@ Seul le dossier `public/` doit être accessible depuis le web. Le code, la confi
 └── public_html/
 ```
 
-1. Envoyer le **contenu** de `prod/` dans `/home/<compte>/lp-consulting/` : cPanel > *Gestionnaire de fichiers* (envoyer un `.zip` puis l'extraire), FTP ou SSH. Ne pas envoyer `config/config.php` local ni `storage/logs/app.log`.
+1. Envoyer le **contenu** de `prod/` dans `/home/<compte>/lp-consulting/` : cPanel > *Gestionnaire de fichiers* (envoyer un `.zip` puis l'extraire), FTP ou SSH. Ne pas envoyer `local-server/`, `config/config.php` local ni `storage/logs/app.log`.
 2. Faire pointer le domaine sur `lp-consulting/public` : cPanel > *Domaines* > *Gérer* > *Racine du document*. Pour le domaine principal du compte, si cPanel impose `public_html`, demander au support o2switch de changer la racine du document.
 3. Si la racine ne peut vraiment pas être changée, solution de repli : mettre le contenu de `prod/` directement dans `public_html/`. Le `.htaccess` racine envoie tout vers `public/` et bloque l'accès au reste.
 
@@ -114,6 +113,13 @@ L'installation crée les tables et importe les textes et projets actuels. Relanc
 - Compléter les mentions légales (valeurs entre crochets) dans *Administration > Coordonnées et mentions*.
 - Déclarer `https://www.lp-consulting.re/sitemap.xml` dans Google Search Console.
 - Sauvegardes : o2switch sauvegarde automatiquement fichiers et bases (restauration dans cPanel > *JetBackup*). Garder en plus, de temps en temps, un export de la base (cPanel > *phpMyAdmin* > *Exporter*) et une copie de `public/uploads/`.
+
+## Fichiers générés
+- **Après chaque modification de `style.css` ou `main.js`**, relancer `php outils/minify.php` (ou le bouton *Tableau de bord > Maintenance*). Il génère `style.min.css`, `main.min.js` et les deux CSS critiques `css/critical-accueil.min.css` et `css/critical-pages.min.css`, intégrés dans le `<head>` pour afficher le premier écran sans attendre la feuille complète (chargée ensuite sans bloquer). Tant qu'ils ne sont pas regénérés, le site sert la source et la feuille complète de façon classique : rien ne casse, c'est seulement plus lent.
+- Le CSS critique retient les règles des classes listées dans `app/Services/Minifier.php` (`CRITICAL_COMMON`, `CRITICAL_SETS`). Une nouvelle classe visible dès le premier écran doit y être ajoutée.
+- Images : à l'envoi depuis l'administration, une copie WebP (qualité 75) et des variantes de 320 à 1600 px (`photo-480w.webp`…) sont créées pour `srcset`. Pour les images déposées par FTP : bouton *Optimiser les images* ou `php outils/images.php` (`--force` pour tout régénérer). Le même script crée l'icône d'onglet `img/logo-favicon.png`.
+- L'image principale de chaque page est préchargée (`preload_image()` dans le gabarit, balise placée dans le `<head>` par la mise en page).
+- Les migrations SQL sont dans `database/migrations/`, à exécuter dans phpMyAdmin avant l'envoi des fichiers.
 
 ## Sécurité
 - **Base de données** : requêtes SQL préparées (PDO) et échappement systématique à l'affichage. Les contenus reçus sont ramenés à la structure attendue.

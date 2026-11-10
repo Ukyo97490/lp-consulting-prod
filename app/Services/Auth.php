@@ -62,6 +62,29 @@ final class Auth
         self::$user = false;
     }
 
+    /**
+     * Le nom se change librement. L'e-mail sert à la connexion : le changer exige le mot de passe actuel.
+     * @return string|null message d'erreur, null si le profil a été mis à jour
+     */
+    public static function updateProfile(int $userId, string $name, string $email, string $current): ?string
+    {
+        $name = trim($name);
+        $email = mb_strtolower(trim($email));
+        if ($name === '' || mb_strlen($name) > 120) return 'Le nom doit contenir entre 1 et 120 caractères.';
+        if (mb_strlen($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) return 'Adresse e-mail invalide.';
+
+        $emailChanged = $email !== (AdminUser::find($userId)['email'] ?? null);
+        if ($emailChanged) {
+            $hash = AdminUser::passwordHash($userId);
+            if (!$hash || !password_verify($current, $hash)) return 'Mot de passe actuel incorrect.';
+            if (AdminUser::findForLogin($email)) return 'Cette adresse est déjà utilisée par un autre compte.';
+        }
+        AdminUser::updateProfile($userId, $name, $email);
+        if ($emailChanged) Session::regenerate();
+        self::$user = null;
+        return null;
+    }
+
     /** @return string|null message d'erreur, null si le mot de passe a été changé */
     public static function changePassword(int $userId, string $current, string $new): ?string
     {

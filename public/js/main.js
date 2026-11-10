@@ -36,7 +36,8 @@
 
   /* ---------- Apparition au défilement ---------- */
   var reveals = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if ("IntersectionObserver" in window && !reduceMotion) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
@@ -48,15 +49,17 @@
   }
 
   /* ---------- Compteurs animés ---------- */
+  /* La valeur finale est déjà écrite dans le HTML : l'animation ne démarre qu'à l'écran,
+     repart de 60 % de cette valeur et ne descend jamais à zéro. */
   var counters = document.querySelectorAll("[data-count]");
   function animateCount(el) {
     var target = parseInt(el.getAttribute("data-count"), 10);
     var prefix = el.getAttribute("data-prefix") || "";
-    var start = null, dur = 1400;
+    var from = Math.round(target * 0.6), start = null, dur = 1000;
     function step(ts) {
       if (!start) start = ts;
       var p = Math.min((ts - start) / dur, 1);
-      el.textContent = prefix + Math.round(target * (1 - Math.pow(1 - p, 3)));
+      el.textContent = prefix + Math.round(from + (target - from) * (1 - Math.pow(1 - p, 3)));
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -75,6 +78,23 @@
   if (!form) return;
   var status = form.querySelector(".form-status");
   var submit = form.querySelector('button[type="submit"]');
+  // Messages modifiables dans l'administration (Textes communs), transmis par l'attribut data-messages.
+  var M = {
+    msg_ok: "Merci, votre demande a bien été envoyée. Nous vous répondons rapidement.",
+    msg_error: "Votre demande n'a pas pu être envoyée. Merci de vérifier les champs signalés.",
+    msg_limit: "Trop de demandes envoyées depuis votre connexion. Merci de réessayer plus tard.",
+    msg_check: "Merci de vérifier les champs signalés.",
+    msg_sending: "Envoi en cours…",
+    msg_network: "Connexion impossible. Merci de réessayer ou de nous écrire par e-mail.",
+    err_required: "Ce champ est requis.",
+    err_consent: "Merci d'accepter pour envoyer votre demande.",
+    err_email: "Adresse e-mail invalide.",
+    err_phone: "Numéro de téléphone invalide."
+  };
+  try {
+    var custom = JSON.parse(form.getAttribute("data-messages") || "{}");
+    Object.keys(custom).forEach(function (k) { if (custom[k]) M[k] = custom[k]; });
+  } catch (err) { /* messages par défaut */ }
 
   // Retour d'un envoi sans JavaScript (?contact=ok) : on nettoie l'adresse affichée.
   if (/[?&]contact=/.test(location.search) && history.replaceState) {
@@ -91,9 +111,9 @@
   function validate(field) {
     var v = field.type === "checkbox" ? field.checked : field.value.trim();
     var msg = "";
-    if (field.required && !v) msg = field.type === "checkbox" ? "Merci d'accepter pour envoyer votre demande." : "Ce champ est requis.";
-    else if (field.type === "email" && v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = "Adresse e-mail invalide.";
-    else if (field.type === "tel" && v && !/^[0-9 +().-]{8,20}$/.test(v)) msg = "Numéro de téléphone invalide.";
+    if (field.required && !v) msg = field.type === "checkbox" ? M.err_consent : M.err_required;
+    else if (field.type === "email" && v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = M.err_email;
+    else if (field.type === "tel" && v && !/^[0-9 +().-]{8,20}$/.test(v)) msg = M.err_phone;
     setError(field, msg);
     return !msg;
   }
@@ -115,26 +135,26 @@
     var ok = true, first = null;
     fields.forEach(function (f) { if (!validate(f)) { ok = false; if (!first) first = f; } });
     if (!ok) {
-      setStatus("ko", "Merci de vérifier les champs signalés.");
+      setStatus("ko", M.msg_check);
       if (first) first.focus();
       return;
     }
     submit.disabled = true;
-    setStatus("", "Envoi en cours…");
+    setStatus("", M.msg_sending);
     fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" }, credentials: "same-origin" })
       .then(function (r) { return r.json().catch(function () { return { status: "erreur", errors: {} }; }); })
       .then(function (res) {
         if (res.status === "ok") {
           form.reset();
-          setStatus("ok", "Merci, votre demande a bien été envoyée. Nous vous répondons rapidement.");
+          setStatus("ok", M.msg_ok);
         } else if (res.status === "limite") {
-          setStatus("ko", "Trop de demandes envoyées depuis votre connexion. Merci de réessayer plus tard.");
+          setStatus("ko", M.msg_limit);
         } else {
           Object.keys(res.errors || {}).forEach(function (k) { if (form[k]) setError(form[k], res.errors[k]); });
-          setStatus("ko", "Votre demande n'a pas pu être envoyée. Merci de vérifier les champs signalés.");
+          setStatus("ko", M.msg_error);
         }
       })
-      .catch(function () { setStatus("ko", "Connexion impossible. Merci de réessayer ou de nous écrire par e-mail."); })
+      .catch(function () { setStatus("ko", M.msg_network); })
       .then(function () { submit.disabled = false; });
   });
 })();
