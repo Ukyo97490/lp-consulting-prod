@@ -435,7 +435,7 @@ p { margin: 0 0 1em; }
 .services { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--line); border: 1px solid var(--line); }
 .service { background: #fff; padding: 36px 34px; position: relative; transition: background .3s; }
 .service:hover { background: var(--mist-2); }
-.service-num { font-family: var(--font-head); font-size: .78rem; font-weight: 700; letter-spacing: .2em; color: var(--sky); margin-bottom: 14px; display: block; }
+.service-num { font-family: var(--font-head); font-size: .78rem; font-weight: 700; letter-spacing: .2em; color: var(--steel); margin-bottom: 14px; display: block; }
 .service h3 { font-size: 1.2rem; }
 .service p { color: var(--muted); margin: 0; }
 
@@ -531,7 +531,7 @@ p { margin: 0 0 1em; }
   border-top: 1px solid rgba(255,255,255,.1); padding: 22px 0;
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: .86rem; color: rgba(255,255,255,.5);
 }
-.footer-bottom a { color: rgba(255,255,255,.6); }
+.footer-bottom a { color: rgba(255,255,255,.6); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Bouton retour haut / appel mobile ---------- */
 .to-top {
